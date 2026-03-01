@@ -11,19 +11,15 @@
 
 <body class="dark theme1">
 
-<!-- NAVBAR -->
 <nav>
   <h2>Wolf<span style="color:var(--g1)">Vox™</span> Forms</h2>
-
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
-
   <div class="nav-links">
-    <a href="/Forms">Home</a>
-    <a href="Create">Publish Your Forms</a>
+    <a href="index.html">Home</a>
+    <a href="Create.html">Publish Your Forms</a>
   </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <h1>Search Submissions</h1>
   <p>Upload forms with images, videos, files & links</p>
@@ -36,10 +32,8 @@
   </div>
 </section>
 
-<!-- RESULTS -->
 <div class="results" id="results"></div>
 
-<!-- THEME SWITCHER -->
 <div class="theme-switcher">
   <button class="theme-btn" style="background:#7a6cff" onclick="setTheme('theme1')"></button>
   <button class="theme-btn" style="background:#00e0ff" onclick="setTheme('theme2')"></button>
@@ -68,39 +62,83 @@ function toggleMode(){
  }
 }
 
-/* SEARCH */
+/* SEARCH & LOAD */
 async function searchForms(){
- const q = searchInput.value || "";
- const res = await fetch(API + "?q=" + encodeURIComponent(q));
- const data = await res.json();
+ const q = document.getElementById("searchInput").value || "";
+ const results = document.getElementById("results");
+ results.innerHTML = "<p style='text-align:center'>Connecting to WolfVox API...</p>";
 
- results.innerHTML="";
- if(data.length===0){
-   results.innerHTML="<p style='text-align:center'>No results found</p>";
-   return;
+ try {
+   const res = await fetch(API + "?q=" + encodeURIComponent(q));
+   const data = await res.json();
+
+   results.innerHTML="";
+   if(data.length===0){
+     results.innerHTML="<p style='text-align:center'>No results found</p>";
+     return;
+   }
+
+   data.reverse().forEach(item=>{
+     results.innerHTML+=`
+     <div class="card">
+       <h2>${item.title}</h2>
+       <p>${item.content}</p>
+       <p><b>Date:</b> ${item.date || "Unknown"}</p>
+
+       ${item.image?`<img src="${item.image}">`:""}
+       ${item.video?`<p><a href="${item.video}" target="_blank">🎬 Watch Video</a></p>`:""}
+       ${item.file?`<p>📎 File: <a href="${item.file}" target="_blank">Download</a></p>`:""}
+       ${item.links && item.links.length?`<p>🔗 ${item.links.join("<br>")}</p>`:""}
+
+       <div class="action-bar">
+         <button onclick="sendVote('${item.title}', 'like')">
+           <i class="fa-solid fa-thumbs-up"></i> <span id="l-${item.title}">${item.likes || 0}</span>
+         </button>
+         <button onclick="sendVote('${item.title}', 'dislike')">
+           <i class="fa-solid fa-thumbs-down"></i> <span id="d-${item.title}">${item.dislikes || 0}</span>
+         </button>
+         <button class="btn-report" onclick="sendVote('${item.title}', 'report')">
+           <i class="fa-solid fa-flag"></i> Report (<span id="r-${item.title}">${item.reports || 0}</span>)
+         </button>
+       </div>
+     </div>`;
+   });
+ } catch (err) {
+    results.innerHTML="<p style='text-align:center; color:#ff4dff;'>Server is sleeping. Please wait 30 seconds and refresh...</p>";
  }
-
- data.reverse().forEach(item=>{
-   results.innerHTML+=`
-   <div class="card">
-     <h2>${item.title}</h2>
-     <p>${item.content}</p>
-     <p><b>Date:</b> ${item.date || "Unknown"}</p>
-
-     ${item.image?`<img src="${item.image}">`:""}
-     ${item.video?`<p><a href="${item.video}" target="_blank">🎬 Watch Video</a></p>`:""}
-     ${item.file?`<p>📎 File: ${item.file}</p>`:""}
-     ${item.links && item.links.length?`<p>🔗 ${item.links.join("<br>")}</p>`:""}
-   </div>`;
- });
 }
+
+/* VOTING & REPORTING */
+async function sendVote(title, type) {
+  try {
+    const res = await fetch(API + "/interact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, type })
+    });
+    
+    const result = await res.json();
+    
+    if (result.success) {
+      if (result.deleted) {
+        alert("This post was removed due to 75+ community reports.");
+        searchForms(); // Reload list
+      } else {
+        // Update specific counters on the page
+        document.getElementById(`l-${title}`).innerText = result.data.likes;
+        document.getElementById(`d-${title}`).innerText = result.data.dislikes;
+        document.getElementById(`r-${title}`).innerText = result.data.reports;
+      }
+    }
+  } catch (err) {
+    console.error("Interaction failed:", err);
+  }
+}
+
+// Initial Load
+searchForms();
+
 </script>
 
 </body>
-
 </html>
-
-
-
-
-
