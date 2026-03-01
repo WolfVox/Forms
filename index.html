@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetStudioAI Forms</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="dark theme1">
+
+<!-- NAVBAR -->
+<nav>
+  <h2>NetStudio<span style="color:var(--g1)">AI</span> Forms</h2>
+
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+
+  <div class="nav-links">
+    <a href="#">Home</a>
+    <a href="create.html">Submit Form</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Search Submissions</h1>
+  <p>Upload forms with images, videos, files & links</p>
+
+  <div class="search-box">
+    <input id="searchInput" placeholder="Search forms...">
+    <button onclick="searchForms()">
+      <i class="fa-solid fa-magnifying-glass"></i> Search
+    </button>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<div class="results" id="results"></div>
+
+<!-- THEME SWITCHER -->
+<div class="theme-switcher">
+  <button class="theme-btn" style="background:#7a6cff" onclick="setTheme('theme1')"></button>
+  <button class="theme-btn" style="background:#00e0ff" onclick="setTheme('theme2')"></button>
+  <button class="theme-btn" style="background:#ff4dff" onclick="setTheme('theme3')"></button>
+  <button class="theme-btn" style="background:#fff;color:black" onclick="toggleMode()">☀</button>
+</div>
+
+<script>
+const API = "http://localhost:3000/forms";
+
+/* MENU */
+function toggleMenu(){
+ document.querySelector(".nav-links").classList.toggle("show");
+}
+
+/* THEME */
+function setTheme(theme){
+ const mode = document.body.classList.contains("light") ? "light" : "dark";
+ document.body.className = mode + " " + theme;
+}
+function toggleMode(){
+ if(document.body.classList.contains("dark")){
+   document.body.className = document.body.className.replace("dark","light");
+ }else{
+   document.body.className = document.body.className.replace("light","dark");
+ }
+}
+
+/* SEARCH */
+async function searchForms(){
+ const q = searchInput.value || "";
+ const res = await fetch(API + "?q=" + encodeURIComponent(q));
+ const data = await res.json();
+
+ results.innerHTML="";
+ if(data.length===0){
+   results.innerHTML="<p style='text-align:center'>No results found</p>";
+   return;
+ }
+
+ data.reverse().forEach(item=>{
+   results.innerHTML+=`
+   <div class="card">
+     <h2>${item.title}</h2>
+     <p>${item.content}</p>
+     <p><b>Date:</b> ${item.date || "Unknown"}</p>
+
+     ${item.image?`<img src="${item.image}">`:""}
+     ${item.video?`<p><a href="${item.video}" target="_blank">🎬 Watch Video</a></p>`:""}
+     ${item.file?`<p>📎 File: ${item.file}</p>`:""}
+     ${item.links && item.links.length?`<p>🔗 ${item.links.join("<br>")}</p>`:""}
+   </div>`;
+ });
+}
+</script>
+
+</body>
+</html>

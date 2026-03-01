@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Form - NetStudioAI</title>
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="dark theme1">
+
+<!-- NAVBAR -->
+<nav>
+  <h2>NetStudio<span style="color:var(--g1)">AI</span> Forms</h2>
+
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="#">Create Form</a>
+  </div>
+</nav>
+
+<!-- CREATE FORM -->
+<section class="publish" style="padding-top:60px">
+  <h1 style="text-align:center;margin-bottom:10px;">Create New Form</h1>
+  <p style="text-align:center;opacity:.7;margin-bottom:30px;">
+    Add images, videos, files, and useful links
+  </p>
+
+  <input id="title" placeholder="Form Title">
+  <textarea id="content" rows="6" placeholder="Write description..."></textarea>
+
+  <input id="image" placeholder="Image URL">
+  <input id="video" placeholder="Video Link (YouTube / MP4)">
+  <input id="file" placeholder="File Name / Download URL">
+  <input id="links" placeholder="Extra Links (comma separated)">
+
+  <button onclick="submitForm()">
+    <i class="fa-solid fa-upload"></i> Publish Form
+  </button>
+</section>
+
+<!-- THEME SWITCHER -->
+<div class="theme-switcher">
+  <button class="theme-btn" style="background:#7a6cff" onclick="setTheme('theme1')"></button>
+  <button class="theme-btn" style="background:#00e0ff" onclick="setTheme('theme2')"></button>
+  <button class="theme-btn" style="background:#ff4dff" onclick="setTheme('theme3')"></button>
+  <button class="theme-btn" style="background:#fff;color:black" onclick="toggleMode()">☀</button>
+</div>
+
+<script>
+const API = "http://localhost:3000/forms";
+
+/* MENU */
+function toggleMenu(){
+ document.querySelector(".nav-links").classList.toggle("show");
+}
+
+/* THEME */
+function setTheme(theme){
+ const mode = document.body.classList.contains("light") ? "light" : "dark";
+ document.body.className = mode + " " + theme;
+}
+function toggleMode(){
+ if(document.body.classList.contains("dark")){
+   document.body.className = document.body.className.replace("dark","light");
+ }else{
+   document.body.className = document.body.className.replace("light","dark");
+ }
+}
+
+/* SUBMIT */
+async function submitForm(){
+ const linksArr = links.value ? links.value.split(",").map(l=>l.trim()) : [];
+
+ await fetch(API,{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+     title:title.value,
+     content:content.value,
+     image:image.value,
+     video:video.value,
+     file:file.value,
+     links:linksArr,
+     date:new Date().toLocaleString()
+   })
+ });
+
+ alert("Form Published!");
+ window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>
