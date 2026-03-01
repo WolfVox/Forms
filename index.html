@@ -110,28 +110,25 @@ async function searchForms(){
 
 /* VOTING & REPORTING */
 async function sendVote(title, type) {
-  try {
-    const res = await fetch(API + "/interact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, type })
-    });
-    
-    const result = await res.json();
-    
-    if (result.success) {
-      if (result.deleted) {
-        alert("This post was removed due to 75+ community reports.");
-        searchForms(); // Reload list
-      } else {
-        // Update specific counters on the page
-        document.getElementById(`l-${title}`).innerText = result.data.likes;
-        document.getElementById(`d-${title}`).innerText = result.data.dislikes;
-        document.getElementById(`r-${title}`).innerText = result.data.reports;
-      }
+  // We add /interact to the end of your API URL
+  const res = await fetch(API + "/interact", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, type })
+  });
+  
+  const result = await res.json();
+  
+  if (result.success) {
+    if (result.deleted) {
+      alert("Removed due to reports.");
+      searchForms(); 
+    } else {
+      // These IDs (l-, d-, r-) must match the ones in your HTML template
+      document.getElementById(`l-${title}`).innerText = result.data.likes;
+      document.getElementById(`d-${title}`).innerText = result.data.dislikes;
+      document.getElementById(`r-${title}`).innerText = result.data.reports;
     }
-  } catch (err) {
-    console.error("Interaction failed:", err);
   }
 }
 
@@ -142,3 +139,4 @@ searchForms();
 
 </body>
 </html>
+
