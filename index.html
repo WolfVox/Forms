@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WolfVox™ Forms</title>
+    <title>WolfVox™ | DevForms</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         :root {
-            --bg: #0a0a0c;
+            --bg: #060608;
+            --header: #111113;
             --card-bg: #161618;
             --border: #2d2d30;
             --accent: #7a6cff;
@@ -16,194 +17,233 @@
             --render-green: #00d1b2;
         }
 
-        body.light {
-            --bg: #f4f4f7;
-            --card-bg: #ffffff;
-            --border: #e1e1e8;
-            --text-main: #1a1a1a;
-            --text-dim: #666666;
+        * { box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; transition: all 0.15s ease; }
+        
+        /* Render-style Background Boxes */
+        body { 
+            background-color: var(--bg); 
+            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 60px 60px;
+            color: var(--text-main); 
+            margin: 0; 
         }
 
-        * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; transition: all 0.2s ease; }
-        body { background-color: var(--bg); color: var(--text-main); margin: 0; overflow-x: hidden; }
-
-        /* Render-style Nav */
+        /* GitHub-style Top Bar */
         nav {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 1rem 2rem; background: var(--card-bg); border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; gap: 20px;
+            padding: 12px 30px; background: var(--header); border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 1000;
         }
-        nav h2 { font-size: 1.2rem; margin: 0; font-weight: 700; letter-spacing: -0.5px; }
+        .search-container { flex: 1; max-width: 400px; position: relative; }
+        .search-container input {
+            width: 100%; background: #000; border: 1px solid var(--border);
+            color: white; padding: 6px 12px 6px 35px; border-radius: 6px; font-size: 13px;
+        }
+        .search-container i { position: absolute; left: 12px; top: 9px; color: var(--text-dim); font-size: 12px; }
 
-        /* Roblox DevForum Style Search Section */
-        .hero { padding: 40px 20px; max-width: 1000px; margin: 0 auto; text-align: left; }
-        .search-box {
-            display: flex; gap: 10px; background: var(--card-bg); 
-            padding: 8px; border-radius: 8px; border: 1px solid var(--border);
+        /* Sub-nav Buttons (GitHub style) */
+        .sub-nav {
+            display: flex; gap: 5px; padding: 10px 30px; 
+            background: var(--header); border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
         }
-        .search-box input {
-            flex: 1; background: transparent; border: none; color: white;
-            padding: 10px; outline: none; font-size: 1rem;
+        .sub-btn {
+            background: transparent; border: none; color: var(--text-main);
+            padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;
+            display: flex; align-items: center; gap: 8px;
         }
-        .search-box button {
-            background: var(--accent); color: white; border: none; 
-            padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600;
-        }
+        .sub-btn:hover { background: var(--border); }
+        .sub-btn.active { border-bottom: 2px solid #f78166; border-radius: 0; font-weight: 600; }
 
-        /* Results List (Roblox Dev Style) */
-        .results { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+        /* Results Area */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; min-height: 60vh; }
         .form-row {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 15px 20px; background: var(--card-bg);
-            border-bottom: 1px solid var(--border); cursor: pointer;
+            padding: 16px; background: var(--card-bg); border: 1px solid var(--border);
+            margin-bottom: -1px; cursor: pointer;
         }
-        .form-row:hover { background: #202022; }
-        .form-info h3 { margin: 0; font-size: 1.05rem; color: var(--accent); }
-        .form-info p { margin: 5px 0 0; font-size: 0.85rem; color: var(--text-dim); }
-
-        /* Detailed Overlay Frame */
+        .form-row:first-child { border-radius: 6px 6px 0 0; }
+        .form-row:last-child { border-radius: 0 0 6px 6px; margin-bottom: 50px; }
+        .form-row:hover { background: #1c1c1f; border-color: var(--text-dim); z-index: 5; position: relative; }
+        
+        /* Overlay Panel */
         .overlay {
-            position: fixed; top: 0; right: -100%; width: 100%; max-width: 500px;
-            height: 100%; background: var(--card-bg); border-left: 1px solid var(--border);
-            box-shadow: -10px 0 30px rgba(0,0,0,0.5); z-index: 1000;
-            padding: 40px; overflow-y: auto; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed; top: 0; right: -100%; width: 100%; max-width: 600px;
+            height: 100%; background: var(--header); border-left: 1px solid var(--border);
+            z-index: 2000; padding: 60px 40px; overflow-y: auto;
         }
-        .overlay.active { right: 0; }
-        .close-btn { position: absolute; top: 20px; left: 20px; cursor: pointer; font-size: 1.5rem; }
+        .overlay.active { right: 0; box-shadow: -20px 0 50px rgba(0,0,0,0.8); }
+        .close-btn { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; color: var(--text-dim); }
 
-        .form-detail-img { width: 100%; border-radius: 8px; margin: 20px 0; border: 1px solid var(--border); }
-        .action-bar { display: flex; gap: 10px; margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px; }
-        .action-bar button { 
-            background: transparent; border: 1px solid var(--border); color: var(--text-main);
-            padding: 8px 15px; border-radius: 6px; cursor: pointer;
+        /* Sitemap Box */
+        .sitemap-container {
+            max-width: 1100px; margin: 80px auto 20px;
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 12px; padding: 40px; display: grid;
+            grid-template-columns: repeat(4, 1fr); gap: 20px;
         }
-        .action-bar button:hover { border-color: var(--accent); color: var(--accent); }
+        .sitemap-col h4 { margin-top: 0; color: var(--text-dim); font-size: 12px; text-transform: uppercase; }
+        .sitemap-col a { display: block; color: var(--accent); text-decoration: none; margin-bottom: 8px; font-size: 14px; }
+        .sitemap-col a:hover { text-decoration: underline; }
 
-        /* Theme Switcher */
-        .theme-switcher { position: fixed; bottom: 20px; left: 20px; display: flex; gap: 8px; }
-        .theme-btn { width: 25px; height: 25px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; }
+        footer {
+            text-align: center; padding: 40px; color: var(--text-dim);
+            font-size: 13px; border-top: 1px solid var(--border);
+        }
+
+        .img-preview { width: 100%; border-radius: 8px; margin: 20px 0; border: 1px solid var(--border); display: block; }
+        .vote-disabled { opacity: 0.5; cursor: not-allowed !important; }
     </style>
 </head>
-<body class="dark">
+<body>
 
 <nav>
-    <h2>Wolf<span style="color:var(--accent)">Vox™</span> Forms</h2>
-    <div class="nav-links">
-        <a href="#" style="color: var(--text-dim); text-decoration: none; font-size: 0.9rem;">Documentation</a>
+    <h2 style="font-size: 18px;">Wolf<span style="color:var(--accent)">Vox</span></h2>
+    <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Search or jump to..." onkeyup="if(event.key==='Enter') searchForms()">
+    </div>
+    <div style="flex-grow: 1;"></div>
+    <div class="nav-links" style="font-size: 14px; display: flex; gap: 15px;">
+        <a href="#" style="color:white; text-decoration:none;">Sign In</a>
+        <button style="background:var(--accent); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer;">Publish</button>
     </div>
 </nav>
 
-<section class="hero">
-    <h1>Community Submissions</h1>
-    <div class="search-box">
-        <input id="searchInput" placeholder="Search topics, forms, or users...">
-        <button onclick="searchForms()"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-    </div>
-</section>
+<div class="sub-nav">
+    <button class="sub-btn active"><i class="fa-solid fa-code"></i> Forms</button>
+    <button class="sub-btn" onclick="alert('Marketplace coming soon!')"><i class="fa-solid fa-shop"></i> Marketplace</button>
+    <button class="sub-btn"><i class="fa-solid fa-book"></i> Docs</button>
+    <button class="sub-btn"><i class="fa-solid fa-chart-line"></i> Insights</button>
+</div>
 
-<div class="results" id="results">
-    </div>
+<div class="container">
+    <div id="results">
+        </div>
+</div>
 
 <div id="detailOverlay" class="overlay">
-    <div class="close-btn" onclick="closeDetail()">×</div>
+    <div class="close-btn" onclick="closeDetail()">&times;</div>
     <div id="detailContent"></div>
 </div>
 
-<div class="theme-switcher">
-    <button class="theme-btn" style="background:#7a6cff" onclick="setTheme('theme1')"></button>
-    <button class="theme-btn" style="background:#00e0ff" onclick="setTheme('theme2')"></button>
-    <button class="theme-btn" style="background:#fff" onclick="toggleMode()"></button>
+<div class="sitemap-container">
+    <div class="sitemap-col">
+        <h4>Product</h4>
+        <a href="#">WolfVox Forms</a>
+        <a href="#">WolfVox Analytics</a>
+        <a href="#">API Access</a>
+    </div>
+    <div class="sitemap-col">
+        <h4>Resources</h4>
+        <a href="#">Documentation</a>
+        <a href="#">Developer Hub</a>
+        <a href="#">Media Assets</a>
+    </div>
+    <div class="sitemap-col">
+        <h4>Community</h4>
+        <a href="#">Roblox DevForum</a>
+        <a href="#">Discord Server</a>
+        <a href="#">Twitter/X</a>
+    </div>
+    <div class="sitemap-col">
+        <h4>Legal</h4>
+        <a href="#">Terms of Service</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Cookie Settings</a>
+    </div>
 </div>
+
+<footer>
+    &copy; 2026 WolfVox Technologies. Built for the developer community.
+</footer>
 
 <script>
 const API = "https://backhand-forms.onrender.com/api/forms";
 let currentData = [];
 
+// Prevent multiple likes logic
+function hasInteracted(title) {
+    return localStorage.getItem(`voted_${title}`);
+}
+
 async function searchForms(){
-    const q = document.getElementById("searchInput").value || "";
+    const q = document.getElementById("searchInput").value;
     const results = document.getElementById("results");
-    results.innerHTML = "<p style='text-align:center; padding: 50px;'>Loading Workspace...</p>";
+    results.innerHTML = "<div style='padding:40px; text-align:center;'>Fetching data from WolfVox API...</div>";
 
     try {
         const res = await fetch(API + "?q=" + encodeURIComponent(q));
         currentData = await res.json();
         results.innerHTML = "";
 
-        if(currentData.length === 0){
-            results.innerHTML = "<p style='text-align:center'>No forms found in this repository.</p>";
-            return;
-        }
-
         currentData.reverse().forEach((item, index) => {
             results.innerHTML += `
             <div class="form-row" onclick="openDetail(${index})">
-                <div class="form-info">
-                    <h3>${item.title}</h3>
-                    <p>Submmited on: ${item.date || 'Recent'}</p>
+                <div>
+                    <span style="color:var(--accent); font-weight:600;">${item.title}</span>
+                    <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">#${index + 101} opened by System</div>
                 </div>
-                <div style="color: var(--text-dim); font-size: 0.9rem;">
-                    <i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}
+                <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
+                    <span><i class="fa-regular fa-comment"></i> 1</span>
+                    <span><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</span>
                 </div>
             </div>`;
         });
-    } catch (err) {
-        results.innerHTML = "<p style='text-align:center; color:#ff4dff;'>Server connection failed. Retrying...</p>";
+    } catch (e) {
+        results.innerHTML = "<div style='color:coral; text-align:center;'>API Offline. Try again in 30s.</div>";
     }
 }
 
 function openDetail(index) {
     const item = currentData[index];
     const content = document.getElementById("detailContent");
+    const voted = hasInteracted(item.title);
     
     content.innerHTML = `
-        <span style="color: var(--render-green); font-size: 0.8rem; font-weight: bold;">LIVE SUBMISSION</span>
-        <h1 style="margin-top: 10px;">${item.title}</h1>
-        <p style="color: var(--text-dim); line-height: 1.6;">${item.content}</p>
+        <h2 style="margin-bottom:5px;">${item.title}</h2>
+        <p style="color:var(--text-dim); font-size:14px; margin-bottom:30px;">Published ${item.date || 'Today'}</p>
         
-        ${item.image ? `<img src="${item.image}" class="form-detail-img">` : ""}
-        
-        <div style="display: grid; gap: 10px; margin-top: 20px;">
-            ${item.video ? `<a href="${item.video}" target="_blank" style="color: var(--accent); text-decoration:none;"><i class="fa-solid fa-video"></i> View Attached Video</a>` : ""}
-            ${item.file ? `<a href="${item.file}" target="_blank" style="color: var(--accent); text-decoration:none;"><i class="fa-solid fa-file-arrow-down"></i> Download Assets</a>` : ""}
+        <div style="background:var(--card-bg); border:1px solid var(--border); padding:20px; border-radius:8px; line-height:1.6;">
+            ${item.content}
+            ${item.image ? `<img src="${item.image}" class="img-preview">` : ""}
         </div>
 
-        <div class="action-bar">
-            <button onclick="sendVote('${item.title}', 'like')"><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</button>
-            <button onclick="sendVote('${item.title}', 'dislike')"><i class="fa-solid fa-thumbs-down"></i></button>
-            <button onclick="sendVote('${item.title}', 'report')" style="color:#ff4d4d"><i class="fa-solid fa-flag"></i></button>
+        <div style="margin-top:25px; display:flex; gap:10px;">
+            <button class="sub-btn ${voted ? 'vote-disabled' : ''}" 
+                    style="background:var(--border); border:1px solid var(--border);"
+                    onclick="${voted ? '' : `sendVote('${item.title}', 'like')`}">
+                <i class="fa-solid fa-thumbs-up"></i> ${voted ? 'Liked' : 'Like'} (${item.likes || 0})
+            </button>
+            <button class="sub-btn" style="background:var(--border); border:1px solid var(--border);" onclick="sendVote('${item.title}', 'report')">
+                <i class="fa-solid fa-flag"></i> Report
+            </button>
         </div>
     `;
     document.getElementById("detailOverlay").classList.add("active");
 }
 
-function closeDetail() {
-    document.getElementById("detailOverlay").classList.remove("active");
-}
-
-function toggleMode() {
-    document.body.classList.toggle("light");
-}
-
 async function sendVote(title, type) {
+    if(type === 'like' && hasInteracted(title)) return;
+
     const res = await fetch(API + "/interact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, type })
     });
+    
     const result = await res.json();
     if (result.success) {
-        if (result.deleted) {
-            alert("Submission removed.");
-            closeDetail();
-            searchForms();
-        } else {
-            // Update the UI inside the overlay
-            searchForms(); 
-            alert("Interaction recorded.");
-        }
+        if(type === 'like') localStorage.setItem(`voted_${title}`, true);
+        searchForms(); // Refresh list
+        closeDetail();
+        alert("Action successful!");
     }
 }
 
+function closeDetail() { document.getElementById("detailOverlay").classList.remove("active"); }
+
+// Init
 searchForms();
 </script>
 </body>
