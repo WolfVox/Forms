@@ -14,6 +14,7 @@
             --accent: #7a6cff;
             --text-main: #eeeeee;
             --text-dim: #a1a1aa;
+            --error: #ff4d4d;
         }
 
         * { box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; transition: all 0.1s ease; }
@@ -32,50 +33,63 @@
             position: sticky; top: 0; z-index: 1000;
         }
 
-        .publish-container { max-width: 800px; margin: 60px auto; padding: 40px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; }
+        .publish-container { max-width: 800px; margin: 40px auto; padding: 40px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; }
 
         h1 { font-size: 24px; margin-bottom: 10px; text-align: center; }
-        p { color: var(--text-dim); text-align: center; margin-bottom: 30px; font-size: 14px; }
+        .subtitle { color: var(--text-dim); text-align: center; margin-bottom: 30px; font-size: 14px; }
 
-        .input-group { margin-bottom: 20px; }
-        label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 8px; }
+        .input-group { margin-bottom: 25px; }
+        label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; }
 
-        input, .editor-container {
+        input {
             width: 100%; background: #000; border: 1px solid var(--border);
-            color: white; padding: 12px; border-radius: 6px; font-size: 14px;
+            color: white; padding: 12px; border-radius: 6px; font-size: 14px; margin-bottom: 10px;
         }
-
-        input:focus, .editor-container:focus-within { border-color: var(--accent); outline: none; }
+        input:focus { border-color: var(--accent); outline: none; }
 
         /* Rich Text Toolbar */
         .toolbar {
-            display: flex; gap: 10px; background: var(--header); 
-            padding: 8px; border: 1px solid var(--border); 
-            border-bottom: none; border-radius: 6px 6px 0 0;
+            display: flex; gap: 8px; background: var(--header); 
+            padding: 10px; border: 1px solid var(--border); 
+            border-bottom: none; border-radius: 6px 6px 0 0; align-items: center;
         }
         .tool-btn {
             background: transparent; border: 1px solid transparent; 
-            color: white; cursor: pointer; padding: 5px 10px; border-radius: 4px;
+            color: white; cursor: pointer; padding: 6px 10px; border-radius: 4px;
+            font-size: 14px;
         }
-        .tool-btn:hover { background: var(--border); }
+        .tool-btn:hover { background: var(--border); border-color: var(--border); }
         
         #editor {
-            min-height: 200px; padding: 15px; background: #000;
+            min-height: 250px; padding: 15px; background: #000;
             border: 1px solid var(--border); border-radius: 0 0 6px 6px;
-            overflow-y: auto; outline: none; line-height: 1.6;
+            outline: none; line-height: 1.6; color: #fff;
         }
 
-        button.main-btn {
+        /* Plugin Chroma Palette */
+        #chromaPalette {
+            display: none; gap: 8px; padding: 10px; background: #000;
+            border: 1px solid var(--border); border-top: none;
+        }
+        .color-box { width: 22px; height: 22px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
+
+        /* Plus Buttons */
+        .plus-btn {
+            background: transparent; border: 1px dashed var(--border);
+            color: var(--accent); padding: 8px 15px; border-radius: 6px;
+            cursor: pointer; font-size: 12px; font-weight: 600; width: 100%;
+            margin-top: 5px;
+        }
+        .plus-btn:hover { background: rgba(122, 108, 255, 0.05); border-color: var(--accent); }
+        .locked-icon { font-size: 10px; margin-left: 5px; opacity: 0.6; }
+
+        .submit-btn {
             width: 100%; background: var(--accent); color: white;
-            border: none; padding: 15px; border-radius: 6px;
-            font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 20px;
+            border: none; padding: 16px; border-radius: 6px;
+            font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 30px;
             display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        button.main-btn:hover { filter: brightness(1.2); }
-
-        .theme-switcher { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px; }
-        .theme-btn { width: 30px; height: 30px; border-radius: 50%; border: 2px solid white; cursor: pointer; }
-
+        .submit-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
     </style>
 </head>
 <body>
@@ -83,155 +97,148 @@
 <nav>
     <h2 style="font-size: 18px; cursor: pointer;" onclick="location.href='index.html'">Wolf<span style="color:var(--accent)">Vox</span></h2>
     <div style="flex-grow: 1;"></div>
-    <div style="font-size: 14px; display: flex; gap: 15px;">
-        <a href="index" style="color:var(--text-dim); text-decoration:none;">Back to Home</a>
-    </div>
+    <a href="index.html" style="color:var(--text-dim); text-decoration:none; font-size: 13px;">Cancel & Exit</a>
 </nav>
 
 <section class="publish-container">
     <h1>Create New Form</h1>
-    <p>Design your form with rich text, images, and links.</p>
+    <p class="subtitle">Design professional developer forms with rich media.</p>
 
     <div class="input-group">
         <label>Form Title</label>
-        <input id="title" placeholder="What is this form about?">
+        <input id="title" placeholder="Enter a catchy title...">
     </div>
 
     <div class="input-group">
-        <label>Description (Rich Text)</label>
-<div class="toolbar">
-    <button class="tool-btn" onclick="execCmd('bold')" title="Bold"><i class="fa-solid fa-bold"></i></button>
-    <button class="tool-btn" onclick="execCmd('italic')" title="Italic"><i class="fa-solid fa-italic"></i></button>
-    <button class="tool-btn" onclick="execCmd('fontName', 'Arial')" title="Set Arial" style="font-family: Arial;">Arial</button>
-    
-    <button class="tool-btn" onclick="toggleColor()" title="Toggle Accent Color">
-        <i class="fa-solid fa-palette" style="color:var(--accent)"></i>
-    </button>
-
-    <button class="tool-btn" onclick="execCmd('removeFormat')" title="Clear All Formatting">
-        <i class="fa-solid fa-eraser"></i>
-    </button>
-</div>
-        <div id="editor" contenteditable="true" placeholder="Write your description here..."></div>
+        <label>Description</label>
+        <div class="toolbar">
+            <button class="tool-btn" onclick="execCmd('bold')" title="Bold"><i class="fa-solid fa-bold"></i></button>
+            <button class="tool-btn" onclick="execCmd('italic')" title="Italic"><i class="fa-solid fa-italic"></i></button>
+            <button class="tool-btn" onclick="execCmd('fontName', 'Arial')" title="Arial Font" style="font-family: Arial;">Arial</button>
+            <button class="tool-btn" onclick="toggleChroma()" title="Text Color"><i class="fa-solid fa-palette"></i></button>
+            <button class="tool-btn" onclick="execCmd('removeFormat')" title="Clear Styling"><i class="fa-solid fa-eraser"></i></button>
+        </div>
+        <div id="chromaPalette">
+            <div class="color-box" style="background:#ff4d4d" onclick="execCmd('foreColor', '#ff4d4d')"></div>
+            <div class="color-box" style="background:#4dff4d" onclick="execCmd('foreColor', '#4dff4d')"></div>
+            <div class="color-box" style="background:#00e0ff" onclick="execCmd('foreColor', '#00e0ff')"></div>
+            <div class="color-box" style="background:#ffff4d" onclick="execCmd('foreColor', '#ffff4d')"></div>
+            <div class="color-box" style="background:#ff4dff" onclick="execCmd('foreColor', '#ff4dff')"></div>
+            <div class="color-box" style="background:#ffffff" onclick="execCmd('foreColor', '#ffffff')"></div>
+        </div>
+        <div id="editor" contenteditable="true" placeholder="Write your content here..."></div>
     </div>
 
     <div class="input-group">
-        <label>Media & Attachments</label>
-        <input id="image" placeholder="Image URL (Direct link)">
-        <input id="video" style="margin-top:10px" placeholder="Video Link (YouTube/MP4)">
+        <label>Image Assets</label>
+        <div id="imageFields"><input name="image" placeholder="https://image-link.png"></div>
+        <button id="addImg" class="plus-btn" onclick="addField('imageFields')">
+            <i class="fa-solid fa-plus"></i> Add More Images <i id="lockImg" class="fa-solid fa-lock locked-icon"></i>
+        </button>
     </div>
 
     <div class="input-group">
-        <label>Resources</label>
-        <input id="file" placeholder="Download File URL">
-        <input id="links" style="margin-top:10px" placeholder="Extra Links (comma separated)">
+        <label>Video Links</label>
+        <div id="videoFields"><input name="video" placeholder="https://youtube.com/watch?v=..."></div>
+        <button id="addVid" class="plus-btn" onclick="addField('videoFields')">
+            <i class="fa-solid fa-plus"></i> Add More Videos <i id="lockVid" class="fa-solid fa-lock locked-icon"></i>
+        </button>
     </div>
 
-    <button class="main-btn" onclick="submitForm()">
-        <i class="fa-solid fa-paper-plane"></i> Publish to WolfVox
+    <div class="input-group">
+        <label>Extra Resources (Links)</label>
+        <div id="linkFields"><input name="links" placeholder="https://github.com/your-project"></div>
+        <button id="addLink" class="plus-btn" onclick="addField('linkFields')">
+            <i class="fa-solid fa-plus"></i> Add More Links <i id="lockLink" class="fa-solid fa-lock locked-icon"></i>
+        </button>
+    </div>
+
+    <button class="submit-btn" onclick="submitForm()">
+        <i class="fa-solid fa-paper-plane"></i> Publish Form
     </button>
 </section>
 
-<div class="theme-switcher">
-    <button class="theme-btn" style="background:#7a6cff" onclick="document.documentElement.style.setProperty('--accent', '#7a6cff')"></button>
-    <button class="theme-btn" style="background:#00e0ff" onclick="document.documentElement.style.setProperty('--accent', '#00e0ff')"></button>
-    <button class="theme-btn" style="background:#ff4dff" onclick="document.documentElement.style.setProperty('--accent', '#ff4dff')"></button>
-</div>
-
 <script>
-const API = "https://backhand-forms.onrender.com/api/forms";
-// Function to handle color toggling
-    function checkPlugins() {
-    // 1. Check for Color Plugin
-    if (!localStorage.getItem('plugin_colors')) {
-        // If they DON'T own it, hide the color palette or alert them
-        document.querySelector('.fa-palette').parentElement.onclick = function() {
-            alert("Go to Marketplace to unlock the Color Plugin!");
-        };
-        document.querySelector('.fa-palette').parentElement.style.opacity = "0.3";
-    }
+    const API = "https://backhand-forms.onrender.com/api/forms";
 
-    // 2. Check for Links Plugin
-    const linkInput = document.getElementById('links');
-    if (!localStorage.getItem('plugin_links')) {
-        linkInput.placeholder = "Links (Locked - Get Fast Links Plugin)";
-        linkInput.disabled = true;
-        linkInput.style.opacity = "0.5";
-    }
-}
+    // --- PLUGIN SYSTEM ---
+    const hasChroma = localStorage.getItem('wv_plugin_chroma') === 'unlocked';
+    const hasExpansion = localStorage.getItem('wv_plugin_expansion') === 'unlocked';
 
-// Run this when the page loads
-window.onload = checkPlugins;
-function toggleColor() {
-    // Check if the current selection is already colored
-    const selection = window.getSelection();
-    if (!selection.rangeCount) return;
-
-    const parent = selection.anchorNode.parentElement;
-    const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-    
-    // If text is already colored, reset it to white (inherit), otherwise set to accent
-    if (parent.style.color === 'var(--accent)' || parent.getAttribute('color') === accentColor) {
-        document.execCommand('foreColor', false, '#eeeeee'); 
-    } else {
-        document.execCommand('foreColor', false, accentColor);
-    }
-}
-
-// Basic command executor
-function execCmd(command, value = null) {
-    document.execCommand(command, false, value);
-    document.getElementById('editor').focus();
-}
-// Editor Commands
-function execCmd(command, value = null) {
-    document.execCommand(command, false, value);
-}
-
-// Submit Data
-async function submitForm() {
-    const title = document.getElementById("title").value;
-    const content = document.getElementById("editor").innerHTML; // Gets formatted HTML
-    const image = document.getElementById("image").value;
-    const video = document.getElementById("video").value;
-    const file = document.getElementById("file").value;
-    const rawLinks = document.getElementById("links").value;
-    
-    if(!title || !content) {
-        alert("Title and Description are required!");
-        return;
-    }
-
-    const linksArr = rawLinks ? rawLinks.split(",").map(l => l.trim()) : [];
-
-    try {
-        const res = await fetch(API, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                title,
-                content,
-                image,
-                video,
-                file,
-                links: linksArr,
-                date: new Date().toLocaleDateString()
-            })
-        });
-
-        if(res.ok) {
-            alert("Form Published Successfully!");
-            window.location.href = "index.html";
+    window.onload = () => {
+        // Unlock visual indicators
+        if(hasExpansion) {
+            document.querySelectorAll('.locked-icon').forEach(i => i.style.display = 'none');
+            document.querySelectorAll('.plus-btn').forEach(b => b.style.borderStyle = 'solid');
         }
-    } catch (e) {
-        alert("Error connecting to server.");
+    };
+
+    // --- EDITOR LOGIC ---
+    function execCmd(command, value = null) {
+        document.execCommand(command, false, value);
+        document.getElementById('editor').focus();
     }
-}
+
+    function toggleChroma() {
+        if(hasChroma) {
+            const palette = document.getElementById('chromaPalette');
+            palette.style.display = (palette.style.display === 'flex') ? 'none' : 'flex';
+        } else {
+            // Default free color
+            execCmd('foreColor', '#7a6cff');
+        }
+    }
+
+    // --- EXPANSION LOGIC ---
+    function addField(containerId) {
+        if(hasExpansion) {
+            const container = document.getElementById(containerId);
+            const input = document.createElement('input');
+            input.placeholder = "Additional URL...";
+            container.appendChild(input);
+        } else {
+            alert("🔒 Feature Locked! Get the 'Expansion Pack' from the Marketplace to add multiple slots.");
+            window.location.href = "Market.html";
+        }
+    }
+
+    // --- SUBMIT LOGIC ---
+    async function submitForm() {
+        const title = document.getElementById('title').value;
+        const content = document.getElementById('editor').innerHTML;
+        
+        if(!title || content === "") return alert("Please fill in the title and description!");
+
+        // Collect all dynamic inputs
+        const images = Array.from(document.querySelectorAll('#imageFields input')).map(i => i.value).filter(v => v);
+        const videos = Array.from(document.querySelectorAll('#videoFields input')).map(i => i.value).filter(v => v);
+        const links = Array.from(document.querySelectorAll('#linkFields input')).map(i => i.value).filter(v => v);
+
+        try {
+            const response = await fetch(API, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    title,
+                    content,
+                    image: images[0] || "", // Primary image
+                    images, // Full array for display logic
+                    video: videos[0] || "", // Primary video
+                    videos,
+                    links,
+                    date: new Date().toLocaleDateString()
+                })
+            });
+
+            if(response.ok) {
+                alert("Form Published Successfully!");
+                window.location.href = "index.html";
+            }
+        } catch (e) {
+            alert("Connection to API failed.");
+        }
+    }
 </script>
 
 </body>
 </html>
-
-
-
-
