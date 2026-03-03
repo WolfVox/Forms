@@ -226,7 +226,7 @@ function openDetail(index) {
     const disliked = hasVoted(item.title, 'disliked');
     const reported = hasVoted(item.title, 'reported');
     
-    // YouTube Embed Logic
+    // 1. YouTube Player Logic
     let videoHTML = "";
     if (item.video) {
         let vidId = "";
@@ -239,20 +239,42 @@ function openDetail(index) {
         }
     }
 
-    // File/Link Logic
+    // 2. File Download Box
     let fileHTML = item.file ? `
-        <div style="margin-top:20px; padding:15px; background:#000; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:space-between;">
-            <div style="font-size:13px;"><i class="fa-solid fa-file-zipper" style="color:var(--accent)"></i> ${item.file.split('/').pop()}</div>
-            <a href="${item.file}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600; font-size:13px;">Download</a>
+        <div style="margin-top:20px; padding:12px; background:#000; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:space-between;">
+            <div style="font-size:13px;"><i class="fa-solid fa-file-arrow-down" style="color:var(--accent)"></i> ${item.file.split('/').pop()}</div>
+            <a href="${item.file}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600; font-size:12px;">Download Attachment</a>
         </div>` : "";
 
+    // 3. EXTERNAL LINKS LOGIC (The Fix)
+    let linksHTML = "";
+    if (item.links && item.links.length > 0) {
+        linksHTML = `<div style="margin-top:20px; display:flex; flex-wrap:wrap; gap:8px;">`;
+        item.links.forEach(link => {
+            if(link.trim() !== "") {
+                linksHTML += `
+                    <a href="${link.startsWith('http') ? link : 'https://' + link}" target="_blank" 
+                       style="background:var(--header); border:1px solid var(--border); color:var(--text-main); 
+                       padding:6px 12px; border-radius:20px; text-decoration:none; font-size:12px; display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-link" style="font-size:10px; color:var(--accent)"></i> 
+                        ${link.replace('https://','').replace('http://','').split('/')[0]}
+                    </a>`;
+            }
+        });
+        linksHTML += `</div>`;
+    }
+
+    // 4. Render Everything
     document.getElementById("detailContent").innerHTML = `
-        <h2 style="font-family: Arial, sans-serif;">${item.title}</h2>
-        <div style="background:var(--card-bg); border:1px solid var(--border); padding:20px; border-radius:8px; margin-top:20px;">
-            <div style="font-family: Arial, sans-serif;">${item.content}</div>
-            ${item.image ? `<img src="${item.image}" class="img-preview">` : ""}
+        <h2 style="font-family: Arial, sans-serif; margin-bottom:5px;">${item.title}</h2>
+        <div style="font-size:12px; color:var(--text-dim); margin-bottom:20px;">Shared via WolfVox Platform</div>
+
+        <div style="background:var(--card-bg); border:1px solid var(--border); padding:20px; border-radius:8px;">
+            <div style="font-family: Arial, sans-serif; line-height:1.6;">${item.content}</div>
+            ${item.image ? `<img src="${item.image}" class="img-preview" style="max-width:100%; border-radius:8px; margin-top:15px;">` : ""}
             ${videoHTML}
             ${fileHTML}
+            ${linksHTML} 
         </div>
         
         <div style="margin-top:25px; display:flex; gap:10px;">
@@ -294,5 +316,6 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
