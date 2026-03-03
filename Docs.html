@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WolfVox™ | Documentation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #060608;
+            --header: #111113;
+            --card-bg: #161618;
+            --border: #2d2d30;
+            --accent: #7a6cff;
+            --text-main: #eeeeee;
+            --text-dim: #a1a1aa;
+        }
+
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        body { background: var(--bg); color: var(--text-main); margin: 0; display: flex; flex-direction: column; height: 100vh; }
+
+        /* NAVBARS (MATCHING INDEX) */
+        nav { display: flex; align-items: center; padding: 12px 30px; background: var(--header); border-bottom: 1px solid var(--border); justify-content: space-between; }
+        .sub-nav { display: flex; gap: 15px; padding: 10px 30px; background: var(--header); border-bottom: 1px solid var(--border); }
+        .sub-btn { background: none; border: none; color: var(--text-dim); font-size: 14px; cursor: pointer; padding: 8px 12px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid transparent; }
+        .sub-btn.active { color: var(--text-main); border-bottom: 2px solid var(--accent); }
+        .sub-btn:hover { color: white; }
+
+        /* MAIN DOCS LAYOUT */
+        .docs-container { display: flex; flex: 1; overflow: hidden; }
+
+        /* SIDEBAR */
+        .sidebar { 
+            width: 260px; background: var(--header); border-right: 1px solid var(--border); 
+            padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+        }
+        .side-link { 
+            text-decoration: none; color: var(--text-dim); font-size: 14px; padding: 8px 12px; 
+            border-radius: 6px; transition: 0.2s; 
+        }
+        .side-link:hover { background: var(--border); color: var(--accent); }
+        .side-link.active { background: rgba(122, 108, 255, 0.1); color: var(--accent); font-weight: 600; }
+        .side-title { font-size: 11px; text-transform: uppercase; color: var(--accent); letter-spacing: 1px; margin-top: 15px; font-weight: 800; }
+
+        /* CONTENT AREA */
+        .content { flex: 1; padding: 40px 60px; overflow-y: auto; line-height: 1.6; }
+        section { margin-bottom: 60px; max-width: 800px; }
+        h1 { font-size: 32px; margin-bottom: 10px; }
+        h2 { font-size: 22px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 30px; color: var(--accent); }
+        p { color: var(--text-dim); font-size: 15px; }
+        
+        .code-block { 
+            background: #000; border: 1px solid var(--border); padding: 15px; 
+            border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; color: #4dff4d; margin: 15px 0;
+        }
+
+        .alert { 
+            padding: 15px; border-radius: 8px; background: rgba(255, 77, 77, 0.1); 
+            border-left: 4px solid #ff4d4d; color: #ff4d4d; font-size: 14px; margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <h2 onclick="location.href='index.html'" style="cursor:pointer; margin:0; font-size: 20px;">Wolf<span style="color:var(--accent)">Vox</span></h2>
+    <div style="color: var(--text-dim); font-size: 13px;">v2.0 Documentation</div>
+</nav>
+
+<div class="sub-nav">
+    <button class="sub-btn" onclick="location.href='index.html'"><i class="fa-solid fa-code"></i> Forms</button>
+    <button class="sub-btn" onclick="location.href='Market.html'"><i class="fa-solid fa-shop"></i> Marketplace</button>
+    <button class="sub-btn active"><i class="fa-solid fa-book"></i> Docs</button>
+    <button class="sub-btn"><i class="fa-solid fa-chart-line"></i> Insights</button>
+</div>
+
+<div class="docs-container">
+    <div class="sidebar">
+        <div class="side-title">Getting Started</div>
+        <a href="#publishing" class="side-link">How to Publish</a>
+        <a href="#plugins" class="side-link">About Plugins</a>
+        
+        <div class="side-title">Features</div>
+        <a href="#colors" class="side-link">More Colours (Chroma+)</a>
+        <a href="#slots" class="side-link">More Links & Slots</a>
+        
+        <div class="side-title">Legal</div>
+        <a href="#terms" class="side-link">Terms & Conditions</a>
+        <a href="#rules" class="side-link">Content Rules</a>
+    </div>
+
+    <div class="content">
+        
+        <section id="publishing">
+            <h1>How to Publish</h1>
+            <p>Publishing on WolfVox is simple. Navigate to the "Publish Your Forms" button on the home page. You will be greeted with our Rich Text Editor.</p>
+            <div class="code-block">Step 1: Enter Title > Step 2: Write Description > Step 3: Add Media > Step 4: Click Publish</div>
+            <p>Once published, your form is instantly visible to the community in the Forms dashboard.</p>
+        </section>
+
+        <section id="plugins">
+            <h2>About Plugins</h2>
+            <p>Plugins are modular upgrades for your WolfVox experience. They do not cost real money but require a <b>Human Verification</b> check to install.</p>
+            <p>To get plugins, visit the <b>Marketplace</b> from the sub-navigation bar. Click "Get It" and type the randomized word in ALL CAPS to verify you are a developer and not a bot.</p>
+        </section>
+
+        <section id="colors">
+            <h2>Chroma+ (More Colours)</h2>
+            <p>By default, the editor allows one signature accent color. Unlocking <b>Chroma+</b> provides a full palette of 6+ professional colors for your descriptions.</p>
+            <p>Select your text, click the palette icon, and choose your color. If the icon is highlighted with a purple border, it means your current selection is colored.</p>
+        </section>
+
+        <section id="slots">
+            <h2>Expansion Pack (Slots)</h2>
+            <p>The standard WolfVox form allows 1 image, 1 video, and 1 link. The <b>Expansion Pack</b> unlocks the <b>[+]</b> buttons.</p>
+            <p>With this plugin, you can add an unlimited number of URLs and assets to a single form, making your posts more detailed and professional.</p>
+        </section>
+
+        <section id="terms">
+            <h2>Terms & Conditions</h2>
+            <p>By using WolfVox, you agree that you are responsible for the content you post. We do not store private data other than what you explicitly provide in the forms.</p>
+            <div class="alert">
+                <strong>Warning:</strong> Any attempt to bypass the Human Verification system or exploit the API will result in a permanent hardware ban.
+            </div>
+        </section>
+
+        <section id="rules">
+            <h2>Content Rules</h2>
+            <p>WolfVox is a professional developer community. Please follow these rules:</p>
+            <ul>
+                <li><b>No Bad Words:</b> Profanity and offensive language are strictly prohibited.</li>
+                <li><b>Respect:</b> Do not post content intended to harass others.</li>
+                <li><b>Quality:</b> Ensure your links and images are working before publishing.</li>
+            </ul>
+            <p>Forms reported for "Bad Language" or "Spam" will be reviewed by the WolfVox automated system and removed if they violate these rules.</p>
+        </section>
+
+    </div>
+</div>
+
+<script>
+    // Smooth scrolling active link highlight
+    const sections = document.querySelectorAll("section");
+    const navLi = document.querySelectorAll(".side-link");
+    window.addEventListener("scroll", () => {
+        let current = "";
+        sections.forEach((section) => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 60) {
+                current = section.getAttribute("id");
+            }
+        });
+
+        navLi.forEach((li) => {
+            li.classList.remove("active");
+            if (li.getAttribute("href").includes(current)) {
+                li.classList.add("active");
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
