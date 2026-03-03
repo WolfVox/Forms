@@ -14,6 +14,7 @@
             --accent: #7a6cff;
             --text-main: #eeeeee;
             --text-dim: #a1a1aa;
+            --render-green: #00d1b2;
             --error: #ff4d4d;
         }
 
@@ -39,28 +40,55 @@
         }
         .search-container i { position: absolute; left: 12px; top: 9px; color: var(--text-dim); font-size: 12px; }
 
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; min-height: 50vh; }
-        .form-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--card-bg); border: 1px solid var(--border); margin-bottom: -1px; cursor: pointer; }
-        .form-row:hover { background: #1c1c1f; border-color: var(--text-dim); z-index: 5; position: relative; }
+        .sub-nav {
+            display: flex; gap: 5px; padding: 10px 30px; 
+            background: var(--header); border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+        .sub-btn {
+            background: transparent; border: none; color: var(--text-main);
+            padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .sub-btn:hover { background: var(--border); }
+        .sub-btn.active { border-bottom: 2px solid #f78166; border-radius: 0; font-weight: 600; }
 
-        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:3000; }
-        .modal-content { background:var(--card-bg); border:1px solid var(--border); padding:30px; border-radius:12px; width:100%; max-width:400px; text-align:center; }
-        .modal-content input { width:100%; padding:12px; margin:10px 0; background:#000; border:1px solid var(--border); color:white; border-radius:6px; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; min-height: 60vh; }
+        .form-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px; background: var(--card-bg); border: 1px solid var(--border);
+            margin-bottom: -1px; cursor: pointer;
+        }
+        .form-row:first-child { border-radius: 6px 6px 0 0; }
+        .form-row:last-child { border-radius: 0 0 6px 6px; margin-bottom: 50px; }
+        .form-row:hover { background: #1c1c1f; border-color: var(--text-dim); z-index: 5; position: relative; }
         
-        .overlay { position: fixed; top: 0; right: -100%; width: 100%; max-width: 600px; height: 100%; background: var(--header); border-left: 1px solid var(--border); z-index: 2000; padding: 60px 40px; overflow-y: auto; }
+        /* Modal & Auth Styles */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 3000; }
+        .modal-content { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; }
+        .modal-content input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid var(--border); color: white; border-radius: 6px; }
+        .btn-google { width: 100%; padding: 12px; background: white; color: black; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
+        .account-box { border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-top: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; text-align: left; }
+        .account-box:hover { background: var(--border); }
+
+        .overlay {
+            position: fixed; top: 0; right: -100%; width: 100%; max-width: 600px;
+            height: 100%; background: var(--header); border-left: 1px solid var(--border);
+            z-index: 2000; padding: 60px 40px; overflow-y: auto;
+        }
         .overlay.active { right: 0; box-shadow: -20px 0 50px rgba(0,0,0,0.8); }
         .close-btn { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; color: var(--text-dim); }
 
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        .action-btn { background: var(--border); color: white; border: 1px solid var(--border); padding: 8px 15px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; }
-        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; border-color: transparent; }
-        .action-btn:hover:not(:disabled) { border-color: var(--accent); }
-        .btn-report:hover:not(:disabled) { color: var(--error); border-color: var(--error); }
-
-        .user-pill { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-        .user-pill img { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--accent); }
-        
-        footer { text-align: center; padding: 40px; color: var(--text-dim); font-size: 13px; border-top: 1px solid var(--border); margin-top: 50px;}
+        .sitemap-container {
+            max-width: 1100px; margin: 80px auto 20px;
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 12px; padding: 40px; display: grid;
+            grid-template-columns: repeat(4, 1fr); gap: 20px;
+        }
+        .sitemap-col a { display: block; color: var(--accent); text-decoration: none; margin-bottom: 8px; font-size: 14px; }
+        footer { text-align: center; padding: 40px; color: var(--text-dim); font-size: 13px; border-top: 1px solid var(--border); }
+        .img-preview { width: 100%; border-radius: 8px; margin: 20px 0; border: 1px solid var(--border); display: block; }
+        .vote-disabled { opacity: 0.3; cursor: not-allowed !important; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -69,28 +97,35 @@
     <h2 style="font-size: 18px;">Wolf<span style="color:var(--accent)">Vox</span></h2>
     <div class="search-container">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="searchInput" placeholder="Search forms..." onkeyup="if(event.key==='Enter') searchForms()">
+        <input type="text" id="searchInput" placeholder="Search or jump to..." onkeyup="if(event.key==='Enter') searchForms()">
     </div>
     <div style="flex-grow: 1;"></div>
     <div class="nav-links" id="navAuthArea" style="font-size: 14px; display: flex; gap: 15px; align-items: center;">
         <a href="javascript:void(0)" onclick="openAuth()" style="color:white; text-decoration:none;">Sign In</a>
-        <button onclick="handlePublishClick()" style="background:var(--accent); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer;">Publish</button>
+        <button onclick="handlePublish()" style="background:var(--accent); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer;">Publish</button>
     </div>
 </nav>
 
 <div id="authModal" class="modal">
     <div class="modal-content" id="modalStage">
         <h3>Sign In</h3>
-        <button onclick="showGoogleAccounts()" style="width:100%; padding:12px; background:white; color:black; border:none; border-radius:6px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:10px;">
+        <button class="btn-google" onclick="showGoogleAccounts()">
             <img src="https://www.google.com/favicon.ico" width="16"> Continue with Google
         </button>
         <div style="margin:15px 0; font-size:12px; color:var(--text-dim);">OR EMAIL</div>
-        <input type="email" id="emailInput" placeholder="admin@wolfvox.com">
-        <input type="password" id="passInput" placeholder="12345">
-        <p id="errorMsg" style="color:var(--error); font-size:11px; display:none;">Something is wrong. Check credentials.</p>
+        <input type="email" id="emailInput" placeholder="Gmail Address">
+        <input type="password" id="passInput" placeholder="Password">
+        <p id="errorMsg" style="color:var(--error); font-size:11px; display:none; margin:0;">Something is wrong. Please check credentials.</p>
         <button onclick="validateLogin()" style="width:100%; padding:10px; background:var(--accent); border:none; color:white; border-radius:6px; cursor:pointer; margin-top:10px;">Login</button>
         <button onclick="closeAuth()" style="background:none; border:none; color:var(--text-dim); margin-top:10px; cursor:pointer;">Cancel</button>
     </div>
+</div>
+
+<div class="sub-nav">
+    <button class="sub-btn active"><i class="fa-solid fa-code"></i> Forms</button>
+    <button class="sub-btn" onclick="alert('Marketplace coming soon!')"><i class="fa-solid fa-shop"></i> Marketplace</button>
+    <button class="sub-btn"><i class="fa-solid fa-book"></i> Docs</button>
+    <button class="sub-btn"><i class="fa-solid fa-chart-line"></i> Insights</button>
 </div>
 
 <div class="container">
@@ -102,124 +137,135 @@
     <div id="detailContent"></div>
 </div>
 
-<footer>&copy; 2026 WolfVox Technologies</footer>
+<div class="sitemap-container">
+    <div class="sitemap-col"><h4>Product</h4><a href="#">Forms</a><a href="#">Analytics</a></div>
+    <div class="sitemap-col"><h4>Resources</h4><a href="#">Docs</a><a href="#">Hub</a></div>
+    <div class="sitemap-col"><h4>Community</h4><a href="#">Discord</a><a href="#">Twitter</a></div>
+    <div class="sitemap-col"><h4>Legal</h4><a href="#">Privacy</a><a href="#">Terms</a></div>
+</div>
+
+<footer>&copy; 2026 WolfVox Technologies. Built for the developer community.</footer>
 
 <script>
 const API = "https://backhand-forms.onrender.com/api/forms";
-let currentUser = JSON.parse(localStorage.getItem('wv_user')) || null;
-let currentForms = [];
+let currentData = [];
+let user = JSON.parse(localStorage.getItem('wv_user')) || null;
 
+// Interaction Checks
+function hasVoted(title, type) { return localStorage.getItem(`${type}_${title}`); }
+
+// Auth Functions
 function openAuth() { document.getElementById('authModal').style.display='flex'; }
 function closeAuth() { document.getElementById('authModal').style.display='none'; }
 
 function validateLogin() {
-    const email = document.getElementById('emailInput').value;
-    const pass = document.getElementById('passInput').value;
-    if(email === "admin@wolfvox.com" && pass === "12345") {
-        loginUser("Admin", email, "https://ui-avatars.com/api/?name=Admin");
+    const e = document.getElementById('emailInput').value;
+    const p = document.getElementById('passInput').value;
+    if(e === "admin@wolfvox.com" && p === "12345") {
+        loginUser("Admin", e, "https://ui-avatars.com/api/?name=Admin");
     } else { document.getElementById('errorMsg').style.display = 'block'; }
 }
 
 function showGoogleAccounts() {
     document.getElementById('modalStage').innerHTML = `
         <h3>Choose an account</h3>
-        <div style="border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-top: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; text-align: left;" onclick="loginUser('Dev User', 'dev@gmail.com', 'https://ui-avatars.com/api/?name=Dev')">
+        <div class="account-box" onclick="loginUser('Dev User', 'dev@gmail.com', 'https://ui-avatars.com/api/?name=Dev')">
             <img src="https://ui-avatars.com/api/?name=Dev" width="30" style="border-radius:50%">
             <div><div style="font-size:13px">Dev User</div><div style="font-size:11px; color:var(--text-dim)">dev@gmail.com</div></div>
         </div>
-        <button onclick="location.reload()" style="background:none; border:none; color:var(--accent); margin-top:15px; cursor:pointer;">Back</button>
-    `;
+        <button onclick="location.reload()" style="background:none; border:none; color:var(--accent); margin-top:15px; cursor:pointer;">Back</button>`;
 }
 
 function loginUser(name, email, img) {
-    localStorage.setItem('wv_user', JSON.stringify({ name, email, avatar: img }));
+    localStorage.setItem('wv_user', JSON.stringify({name, email, img}));
     location.reload();
 }
 
-function handlePublishClick() {
-    if(!currentUser) {
-        alert("Action Required: Please sign in with your Gmail to publish.");
-        openAuth();
-    } else {
-        // Direct redirection, no message
-        window.location.href = 'Create.html'; 
-    }
+function handlePublish() {
+    if(!user) { openAuth(); } else { window.location.href = 'Publish.html'; }
 }
 
 function updateNav() {
-    if(currentUser) {
+    if(user) {
         document.getElementById('navAuthArea').innerHTML = `
-            <div class="user-pill"><span>${currentUser.name}</span><img src="${currentUser.avatar}"></div>
-            <button onclick="handlePublishClick()" style="background:var(--accent); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer;">Publish</button>
-            <a href="javascript:void(0)" onclick="localStorage.removeItem('wv_user'); location.reload();" style="color:var(--error); text-decoration:none; font-size:11px;">Logout</a>
-        `;
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:12px;">${user.name}</span>
+                <img src="${user.img}" width="24" style="border-radius:50%; border:1px solid var(--accent)">
+            </div>
+            <button onclick="handlePublish()" style="background:var(--accent); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer;">Publish</button>
+            <a href="#" onclick="localStorage.removeItem('wv_user'); location.reload();" style="color:var(--error); text-decoration:none; font-size:11px;">Logout</a>`;
     }
 }
 
+// Data Handling
 async function searchForms(){
-    const q = document.getElementById("searchInput").value;
     const results = document.getElementById("results");
-    results.innerHTML = "<div style='text-align:center;'>Searching WolfVox...</div>";
+    results.innerHTML = "<div style='padding:40px; text-align:center;'>Fetching WolfVox API...</div>";
     try {
-        const res = await fetch(API + "?q=" + encodeURIComponent(q));
-        currentForms = await res.json();
+        const res = await fetch(API);
+        currentData = await res.json();
         results.innerHTML = "";
-        currentForms.reverse().forEach((item, index) => {
+        currentData.reverse().forEach((item, index) => {
             results.innerHTML += `
             <div class="form-row" onclick="openDetail(${index})">
-                <div><span style="color:var(--accent); font-weight:600;">${item.title}</span></div>
-                <div style="color:var(--text-dim); font-size:13px;"><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</div>
+                <div>
+                    <span style="color:var(--accent); font-weight:600;">${item.title}</span>
+                    <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">#${index + 101} by System</div>
+                </div>
+                <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
+                    <span><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</span>
+                </div>
             </div>`;
         });
-    } catch (e) { results.innerHTML = "<div style='text-align:center;'>Offline.</div>"; }
+    } catch (e) { results.innerHTML = "<div style='color:coral; text-align:center;'>API Offline.</div>"; }
 }
 
 function openDetail(index) {
-    const item = currentForms[index];
-    const hasLiked = localStorage.getItem(`voted_${item.title}`);
-    const hasDisliked = localStorage.getItem(`disliked_${item.title}`);
-    const hasReported = localStorage.getItem(`reported_${item.title}`);
-
+    const item = currentData[index];
+    const liked = hasVoted(item.title, 'voted');
+    const disliked = hasVoted(item.title, 'disliked');
+    const reported = hasVoted(item.title, 'reported');
+    
     document.getElementById("detailContent").innerHTML = `
         <h2>${item.title}</h2>
         <div style="background:var(--card-bg); border:1px solid var(--border); padding:20px; border-radius:8px; margin-top:20px;">
-            <p>${item.content}</p>
-            ${item.image ? `<img src="${item.image}" style="width:100%; border-radius:8px; margin-top:10px;">` : ""}
+            ${item.content}
+            ${item.image ? `<img src="${item.image}" class="img-preview">` : ""}
         </div>
-        <div class="btn-group">
-            <button class="action-btn" onclick="sendVote('${item.title}', 'like')" ${hasLiked ? 'disabled' : ''}>
-                <i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}
+        <div style="margin-top:25px; display:flex; gap:10px;">
+            <button class="sub-btn ${liked ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'like')">
+                <i class="fa-solid fa-thumbs-up"></i> ${liked ? 'Liked' : 'Like'} (${item.likes || 0})
             </button>
-            <button class="action-btn" onclick="sendVote('${item.title}', 'dislike')" ${hasDisliked ? 'disabled' : ''}>
-                <i class="fa-solid fa-thumbs-down"></i> ${item.dislikes || 0}
+            <button class="sub-btn ${disliked ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'dislike')">
+                <i class="fa-solid fa-thumbs-down"></i> Dislike
             </button>
-            <button class="action-btn btn-report" onclick="sendVote('${item.title}', 'report')" ${hasReported ? 'disabled' : ''}>
-                <i class="fa-solid fa-flag"></i> ${hasReported ? 'Reported' : 'Report'} (${item.reports || 0})
+            <button class="sub-btn ${reported ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'report')">
+                <i class="fa-solid fa-flag"></i> Report
             </button>
-        </div>
-    `;
+        </div>`;
     document.getElementById("detailOverlay").classList.add("active");
 }
 
 async function sendVote(title, type) {
+    // If disliking while liked, we remove the like first locally to simulate mutual exclusivity
+    if(type === 'dislike' && hasVoted(title, 'voted')) {
+        localStorage.removeItem(`voted_${title}`);
+    }
+
     const res = await fetch(API + "/interact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, type })
     });
-    const result = await res.json();
-    if (result.success) {
-        // Correctly save the interaction type to prevent multiple spamming
-        const storageKey = type === 'like' ? `voted_${title}` : `${type}d_${title}`;
-        localStorage.setItem(storageKey, true);
-        
-        searchForms(); // Refresh background list
-        closeDetail(); // Close to show update
+    
+    if ((await res.json()).success) {
+        const key = type === 'like' ? 'voted' : type === 'dislike' ? 'disliked' : 'reported';
+        localStorage.setItem(`${key}_${title}`, true);
+        searchForms(); closeDetail();
     }
 }
 
 function closeDetail() { document.getElementById("detailOverlay").classList.remove("active"); }
-
 updateNav();
 searchForms();
 </script>
