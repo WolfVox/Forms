@@ -99,12 +99,19 @@
 
     <div class="input-group">
         <label>Description (Rich Text)</label>
-        <div class="toolbar">
-            <button class="tool-btn" onclick="execCmd('bold')" title="Bold"><i class="fa-solid fa-bold"></i></button>
-            <button class="tool-btn" onclick="execCmd('italic')" title="Italic"><i class="fa-solid fa-italic"></i></button>
-            <button class="tool-btn" onclick="execCmd('fontName', 'Arial')" style="font-family: Arial;">Arial</button>
-            <button class="tool-btn" onclick="execCmd('foreColor', '#7a6cff')"><i class="fa-solid fa-palette" style="color:#7a6cff"></i></button>
-        </div>
+<div class="toolbar">
+    <button class="tool-btn" onclick="execCmd('bold')" title="Bold"><i class="fa-solid fa-bold"></i></button>
+    <button class="tool-btn" onclick="execCmd('italic')" title="Italic"><i class="fa-solid fa-italic"></i></button>
+    <button class="tool-btn" onclick="execCmd('fontName', 'Arial')" title="Set Arial" style="font-family: Arial;">Arial</button>
+    
+    <button class="tool-btn" onclick="toggleColor()" title="Toggle Accent Color">
+        <i class="fa-solid fa-palette" style="color:var(--accent)"></i>
+    </button>
+
+    <button class="tool-btn" onclick="execCmd('removeFormat')" title="Clear All Formatting">
+        <i class="fa-solid fa-eraser"></i>
+    </button>
+</div>
         <div id="editor" contenteditable="true" placeholder="Write your description here..."></div>
     </div>
 
@@ -133,7 +140,28 @@
 
 <script>
 const API = "https://backhand-forms.onrender.com/api/forms";
+// Function to handle color toggling
+function toggleColor() {
+    // Check if the current selection is already colored
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
 
+    const parent = selection.anchorNode.parentElement;
+    const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+    
+    // If text is already colored, reset it to white (inherit), otherwise set to accent
+    if (parent.style.color === 'var(--accent)' || parent.getAttribute('color') === accentColor) {
+        document.execCommand('foreColor', false, '#eeeeee'); 
+    } else {
+        document.execCommand('foreColor', false, accentColor);
+    }
+}
+
+// Basic command executor
+function execCmd(command, value = null) {
+    document.execCommand(command, false, value);
+    document.getElementById('editor').focus();
+}
 // Editor Commands
 function execCmd(command, value = null) {
     document.execCommand(command, false, value);
@@ -182,5 +210,6 @@ async function submitForm() {
 
 </body>
 </html>
+
 
 
