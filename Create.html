@@ -141,6 +141,27 @@
 <script>
 const API = "https://backhand-forms.onrender.com/api/forms";
 // Function to handle color toggling
+    function checkPlugins() {
+    // 1. Check for Color Plugin
+    if (!localStorage.getItem('plugin_colors')) {
+        // If they DON'T own it, hide the color palette or alert them
+        document.querySelector('.fa-palette').parentElement.onclick = function() {
+            alert("Go to Marketplace to unlock the Color Plugin!");
+        };
+        document.querySelector('.fa-palette').parentElement.style.opacity = "0.3";
+    }
+
+    // 2. Check for Links Plugin
+    const linkInput = document.getElementById('links');
+    if (!localStorage.getItem('plugin_links')) {
+        linkInput.placeholder = "Links (Locked - Get Fast Links Plugin)";
+        linkInput.disabled = true;
+        linkInput.style.opacity = "0.5";
+    }
+}
+
+// Run this when the page loads
+window.onload = checkPlugins;
 function toggleColor() {
     // Check if the current selection is already colored
     const selection = window.getSelection();
@@ -210,6 +231,7 @@ async function submitForm() {
 
 </body>
 </html>
+
 
 
 
