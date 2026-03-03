@@ -198,26 +198,76 @@ function updateNav() {
 }
 
 // Data Handling
-async function searchForms(){
+async function searchForms() {
+    const q = document.getElementById("searchInput").value.toLowerCase().trim();
     const results = document.getElementById("results");
-    results.innerHTML = "<div style='padding:40px; text-align:center;'>Fetching WolfVox API...</div>";
+    
+    results.innerHTML = "<div style='padding:40px; text-align:center;'>Searching WolfVox Database...</div>";
+
     try {
+        // Fetch fresh data
         const res = await fetch(API);
-        currentData = await res.json();
+        let data = await res.json();
+        
+        // 1. FILTER: Only show forms where the title or content includes the search text
+        // If the search box is empty, it shows everything.
+        const filteredData = data.filter(item => {
+            const titleMatch = item.title && item.title.toLowerCase().includes(q);
+            const contentMatch = item.content && item.content.toLowerCase().includes(q);
+            return titleMatch || contentMatch;
+        });
+
         results.innerHTML = "";
-        currentData.reverse().forEach((item, index) => {
+
+        if (filteredData.length === 0) {
+            results.innerHTML = `
+                <div style="padding:60px; text-align:center; color:var(--text-dim);">
+                    <i class="fa-solid fa-magnifying-glass" style="font-size:30px; margin-bottom:15px; opacity:0.3;"></i>
+                    <p>No forms found matching "<b>${q}</b>"</p>
+                    <button onclick="document.getElementById('searchInput').value=''; searchForms();" 
+                            style="background:none; border:1px solid var(--border); color:var(--accent); padding:8px 15px; border-radius:6px; cursor:pointer;">
+                        Clear Search
+                    </button>
+                </div>`;
+            return;
+        }
+
+        // 2. RENDER: Show filtered results (Reverse to show newest first)
+        filteredData.reverse().forEach((item, index) => {
+            // Find the original index for the openDetail function
+            // We use item.title as a reference
+            const originalIndex = data.indexOf(item);
+            
             results.innerHTML += `
-            <div class="form-row" onclick="openDetail(${index})">
+            <div class="form-row" onclick="openDetailFromData(${JSON.stringify(item).replace(/"/g, '&quot;')})">
                 <div>
                     <span style="color:var(--accent); font-weight:600;">${item.title}</span>
-                    <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">#${index + 101} by System</div>
+                    <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">
+                        Published ${item.date || 'Recently'}
+                    </div>
                 </div>
                 <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
                     <span><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</span>
                 </div>
             </div>`;
         });
-    } catch (e) { results.innerHTML = "<div style='color:coral; text-align:center;'>API Offline.</div>"; }
+
+        // Store current viewable data for the detail panel
+        currentData = filteredData;
+
+    } catch (e) {
+        results.innerHTML = "<div style='color:coral; text-align:center; padding:40px;'>Search Offline. Check API connection.</div>";
+    }
+}
+
+// Helper to open details for specific search results
+function openDetailFromData(item) {
+    // We update currentData to a single-item array so the existing detail logic works
+    currentData = [item];
+    openDetail(0);
+    // Refresh full list in background so currentData is restored
+    const q = document.getElementById("searchInput").value;
+    if(!q) searchForms(); 
 }
 
 function openDetail(index) {
@@ -316,6 +366,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
