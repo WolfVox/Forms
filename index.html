@@ -91,6 +91,58 @@
         .img-preview { width: 100%; border-radius: 8px; margin: 20px 0; border: 1px solid var(--border); display: block; }
         .vote-disabled { opacity: 0.3; cursor: not-allowed !important; pointer-events: none; }
 
+
+
+        .FeedBackBtn{
+    position:relative;
+    overflow:hidden;
+    border-radius:0px;
+    border:1px solid rgb(255, 255, 255);
+    background:rgba(0, 0, 0, 0.02);
+    color:white;
+    font-weight:600;
+    letter-spacing:0.4px;
+    backdrop-filter:blur(6px);
+    transition:all .25s cubic-bezier(.4,0,.2,1);
+    box-shadow:0 4px 18px rgba(0,0,0,0.25);
+}
+/* directional wipe */
+.FeedBackBtn::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:#ffffff;
+    transform:scaleX(0);
+    transform-origin:right;
+    transition:transform .35s cubic-bezier(.65,0,.35,1);
+    z-index:-1;
+}
+
+.FeedBackBtn:hover::before{
+    transform-origin:left;
+    transform:scaleX(1);
+}
+
+.FeedBackBtn:hover{
+    color:#000;
+    border-color:#ffffff;
+}
+/* spacing block */
+.InputFeedback{
+    border:none;
+}
+
+
+/* Hover → expand from left to right */
+.FeedBackBtn:hover::before{
+    transform-origin:left;    /* switch anchor to left */
+    transform:scaleX(1);
+}
+
+.FeedBackBtn:hover{
+    color:#000;
+    border-color:#ffffff;
+}
     </style>
 </head>
 <body>
@@ -104,7 +156,7 @@
     <div style="flex-grow: 1;"></div>
     <div class="nav-links" id="navAuthArea" style="font-size: 14px; display: flex; gap: 15px; align-items: center;">
         <a href="javascript:void(0)" onclick="openAuth()" style="color:white; text-decoration:none;">Sign In</a>
-        <button onclick="handlePublish()" style="background:var(--accent); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer;">Publish</button>
+        <button onclick="handlePublish()" class="FeedBackBtn">Publish</button>
     </div>
 </nav>
 
@@ -376,6 +428,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
