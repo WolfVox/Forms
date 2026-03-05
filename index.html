@@ -296,12 +296,35 @@ async function adminNuke(title) {
     searchForms();
 }
 
-async function sendVote(title, type) {
-    if(type === 'dislike' && hasVoted(title, 'voted')) { localStorage.removeItem(`voted_${title}`); }
-    const res = await fetch(API + "/interact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, type }) });
-    if ((await res.json()).success) { 
-        localStorage.setItem(`${type==='like'?'voted':type==='dislike'?'disliked':'reported'}_${title}`, true); 
-        searchForms(); closeDetail(); 
+async function sendVote(title, email, type) {
+
+    // if user dislikes but already liked, remove like
+    if(type === 'dislike' && hasVoted(title, 'voted')) {
+        localStorage.removeItem(`voted_${title}`);
+    }
+
+    const res = await fetch(API + "/interact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            title: title,
+            authorEmail: email,
+            type: type
+        })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+
+        // store vote locally
+        localStorage.setItem(
+            `${type === 'like' ? 'voted' : type === 'dislike' ? 'disliked' : 'reported'}_${title}`,
+            true
+        );
+
+        searchForms();
+        closeDetail();
     }
 }
 
@@ -312,6 +335,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
