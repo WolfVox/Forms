@@ -66,7 +66,6 @@
         .form-row:last-child { border-radius: 0 0 6px 6px; margin-bottom: 50px; }
         .form-row:hover { background: #1c1c1f; border-color: var(--text-dim); z-index: 5; position: relative; }
         
-        /* Modal & Auth Styles */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 3000; }
         .modal-content { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; }
         .modal-content input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid var(--border); color: white; border-radius: 6px; }
@@ -79,14 +78,6 @@
         .overlay.active { right: 0; box-shadow: -20px 0 50px rgba(0,0,0,0.8); }
         .close-btn { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; color: var(--text-dim); }
 
-        .sitemap-container {
-            max-width: 1100px; margin: 80px auto 20px;
-            background: var(--card-bg); border: 1px solid var(--border);
-            border-radius: 12px; padding: 40px; display: flex;
-            justify-content: space-evenly; align-items: center;
-        }
-        .sitemap-col a { display: block; color: var(--accent); text-decoration: none; margin-bottom: 8px; font-size: 14px; }
-        
         footer { text-align: center; padding: 40px; color: var(--text-dim); font-size: 13px; background-color: #0f0f0f ; border-top: 1px solid var(--border); }
         .img-preview { width: 100%; border-radius: 8px; margin: 20px 0; border: 1px solid var(--border); display: block; }
         .vote-disabled { opacity: 0.3; cursor: not-allowed !important; pointer-events: none; }
@@ -123,7 +114,6 @@
 <div id="authModal" class="modal">
     <div class="modal-content">
         <h3>Sign In</h3>
-        
         <div id="g_id_onload"
              data-client_id="116311894928-qararv9qqqhtjomb2nbljfbrgrho9uft.apps.googleusercontent.com"
              data-context="signin"
@@ -131,39 +121,21 @@
              data-callback="handleGoogleLogin"
              data-auto_prompt="false">
         </div>
-
-        <div class="g_id_signin"
-             data-type="standard"
-             data-shape="pill"
-             data-theme="filled_black"
-             data-text="continue_with"
-             data-size="large"
-             data-logo_alignment="left"
-             style="display: flex; justify-content: center;">
-        </div>
-
-        <div style="margin:20px 0; font-size:12px; color:var(--text-dim);">OR EMAIL</div>
-        <input type="email" id="emailInput" placeholder="Gmail Address">
-        <input type="password" id="passInput" placeholder="Password">
-        <p id="errorMsg" style="color:var(--error); font-size:11px; display:none; margin:0;">Invalid credentials.</p>
-        <button onclick="validateLogin()" style="width:100%; padding:10px; background:var(--accent); border:none; color:white; border-radius:6px; cursor:pointer; margin-top:10px;">Login</button>
+        <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="filled_black" data-text="continue_with" data-size="large" data-logo_alignment="left" style="display: flex; justify-content: center;"></div>
+        
+        <div style="margin:25px 0 10px; font-size:12px; color:var(--text-dim);">DIRECT LOGIN (DECORATION)</div>
+        <input type="email" id="emailInput" placeholder="Email Address" disabled>
+        <input type="password" id="passInput" placeholder="Password" disabled>
+        <button style="width:100%; padding:10px; background:var(--border); border:none; color:var(--text-dim); border-radius:6px; cursor:not-allowed; margin-top:5px;">Sign In Disabled</button>
         <button onclick="closeAuth()" style="background:none; border:none; color:var(--text-dim); margin-top:10px; cursor:pointer;">Cancel</button>
     </div>
 </div>
 
 <div class="sub-nav">
-    <button class="sub-btn active" onclick="location.href='index.html'">
-        <i class="fa-solid fa-code"></i> Forms
-    </button>
-    <button class="sub-btn" onclick="location.href='Market'">
-        <i class="fa-solid fa-shop"></i> Marketplace
-    </button>
-    <button class="sub-btn" onclick="location.href='Docs'">
-        <i class="fa-solid fa-book"></i> Docs
-    </button>
-    <button class="sub-btn" onclick="location.href='Insights'">
-        <i class="fa-solid fa-chart-line"></i> Insights
-    </button>
+    <button class="sub-btn active" onclick="location.href='index.html'"><i class="fa-solid fa-code"></i> Forms</button>
+    <button class="sub-btn" onclick="location.href='Market'"><i class="fa-solid fa-shop"></i> Marketplace</button>
+    <button class="sub-btn" onclick="location.href='Docs'"><i class="fa-solid fa-book"></i> Docs</button>
+    <button class="sub-btn" onclick="location.href='Insights'"><i class="fa-solid fa-chart-line"></i> Insights</button>
 </div>
 
 <div class="container">
@@ -175,13 +147,6 @@
     <div id="detailContent"></div>
 </div>
 
-<div class="sitemap-container">
-    <div class="sitemap-col"><h4>Product</h4><a href="#">Forms</a><a href="#">Analytics</a></div>
-    <div class="sitemap-col"><h4>Resources</h4><a href="#">Docs</a><a href="#">Hub</a></div>
-    <div class="sitemap-col"><h4>Community</h4><a href="#">Discord</a><a href="#">Twitter</a></div>
-    <div class="sitemap-col"><h4>Legal</h4><a href="#">Privacy</a><a href="#">Terms</a></div>
-</div>
-
 <footer>&copy; 2026 WolfVoxCo | Community Forms.</footer>
 
 <script>
@@ -189,24 +154,16 @@ const API = "https://backhand-forms.onrender.com/api/forms";
 let currentData = [];
 let user = JSON.parse(localStorage.getItem('wv_user')) || null;
 
-// Interaction Checks
-function hasVoted(title, type) { return localStorage.getItem(`${type}_${title}`); }
+// ADMIN & VERIFY CONFIG
+const ADMIN_EMAIL = "wolfvoxco@gmail.com";
 
-// Auth Functions
+function hasVoted(title, type) { return localStorage.getItem(`${type}_${title}`); }
 function openAuth() { document.getElementById('authModal').style.display='flex'; }
 function closeAuth() { document.getElementById('authModal').style.display='none'; }
 
 function handleGoogleLogin(response) {
     const payload = JSON.parse(atob(response.credential.split('.')[1]));
     loginUser(payload.name, payload.email, payload.picture);
-}
-
-function validateLogin() {
-    const e = document.getElementById('emailInput').value;
-    const p = document.getElementById('passInput').value;
-    if(e === "admin@wolfvox.com" && p === "12345") {
-        loginUser("Admin", e, "https://ui-avatars.com/api/?name=Admin");
-    } else { document.getElementById('errorMsg').style.display = 'block'; }
 }
 
 function loginUser(name, email, img) {
@@ -230,7 +187,6 @@ function updateNav() {
     }
 }
 
-// Data Handling
 async function searchForms() {
     const q = document.getElementById("searchInput").value.toLowerCase().trim();
     const results = document.getElementById("results");
@@ -239,25 +195,22 @@ async function searchForms() {
     try {
         const res = await fetch(API);
         let data = await res.json();
-        
-        const filteredData = data.filter(item => {
-            const titleMatch = item.title && item.title.toLowerCase().includes(q);
-            const contentMatch = item.content && item.content.toLowerCase().includes(q);
-            return titleMatch || contentMatch;
-        });
+        const filteredData = data.filter(item => (item.title?.toLowerCase().includes(q) || item.content?.toLowerCase().includes(q)));
 
         results.innerHTML = "";
-        if (filteredData.length === 0) {
-            results.innerHTML = `<div style="padding:60px; text-align:center; color:var(--text-dim);"><p>No forms found matching "<b>${q}</b>"</p></div>`;
-            return;
-        }
+        filteredData.reverse().forEach((item) => {
+            const authorImg = item.authorImg || `https://ui-avatars.com/api/?name=${item.authorName || '?'}`;
+            const authorName = item.authorName || "Anonymous";
+            const isVerified = item.authorEmail === ADMIN_EMAIL;
 
-        filteredData.reverse().forEach((item, index) => {
             results.innerHTML += `
             <div class="form-row" onclick="openDetailFromData(${JSON.stringify(item).replace(/"/g, '&quot;')})">
                 <div>
                     <span style="color:var(--accent); font-weight:600;">${item.title}</span>
-                    <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">Published ${item.date || 'Recently'}</div>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-dim); margin-top: 4px;">
+                        <img src="${authorImg}" width="16" height="16" style="border-radius:50%; border:1px solid var(--border);">
+                        <span>by ${authorName} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''} • ${item.date || 'Recently'}</span>
+                    </div>
                 </div>
                 <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
                     <span><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</span>
@@ -265,99 +218,63 @@ async function searchForms() {
             </div>`;
         });
         currentData = filteredData;
-    } catch (e) {
-        results.innerHTML = "<div style='color:coral; text-align:center; padding:40px;'>Search Offline.</div>";
-    }
+    } catch (e) { results.innerHTML = "<div style='color:coral; text-align:center; padding:40px;'>Search Offline.</div>"; }
 }
 
-function openDetailFromData(item) {
-    currentData = [item];
-    openDetail(0);
-}
+function openDetailFromData(item) { currentData = [item]; openDetail(0); }
 
 function openDetail(index) {
     const item = currentData[index];
     const liked = hasVoted(item.title, 'voted');
-    const disliked = hasVoted(item.title, 'disliked');
     const reported = hasVoted(item.title, 'reported');
     
-    // Author Profile Header
     const authorImg = item.authorImg || `https://ui-avatars.com/api/?name=${item.authorName || '?'}`;
-    const authorName = item.authorName || "Anonymous";
     const authorEmail = item.authorEmail || "Public Contributor";
+    const isVerified = authorEmail === ADMIN_EMAIL;
+    const isCurrentUserAdmin = user && user.email === ADMIN_EMAIL;
 
-    // Video Logic
-    let videoHTML = "";
+    let mediaHTML = "";
     if (item.video) {
-        let vidId = "";
-        if (item.video.includes("v=")) vidId = item.video.split("v=")[1].split("&")[0];
-        else if (item.video.includes("youtu.be/")) vidId = item.video.split("youtu.be/")[1];
-        if (vidId) {
-            videoHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen style="border-radius:8px; margin-top:15px; border:1px solid var(--border);"></iframe>`;
-        }
-    }
-
-    // File Logic
-    let fileHTML = item.file ? `<div style="margin-top:20px; padding:12px; background:#000; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:space-between;"><div style="font-size:13px;"><i class="fa-solid fa-file-arrow-down" style="color:var(--accent)"></i> ${item.file.split('/').pop()}</div><a href="${item.file}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600; font-size:12px;">Download Attachment</a></div>` : "";
-
-    // Links Logic
-    let linksHTML = "";
-    if (item.links && item.links.length > 0) {
-        linksHTML = `<div style="margin-top:20px; display:flex; flex-wrap:wrap; gap:8px;">`;
-        item.links.forEach(link => {
-            if(link && link.trim() !== "") {
-                linksHTML += `<a href="${link.startsWith('http') ? link : 'https://' + link}" target="_blank" style="background:var(--card-bg); border:1px solid var(--border); color:var(--text-main); padding:6px 12px; border-radius:20px; text-decoration:none; font-size:12px; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-link" style="font-size:10px; color:var(--accent)"></i> ${link.replace('https://','').replace('http://','').split('/')[0]}</a>`;
-            }
-        });
-        linksHTML += `</div>`;
+        let vidId = item.video.includes("v=") ? item.video.split("v=")[1].split("&")[0] : item.video.split("youtu.be/")[1];
+        if (vidId) mediaHTML += `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen style="border-radius:8px; margin-top:15px; border:1px solid var(--border);"></iframe>`;
     }
 
     document.getElementById("detailContent").innerHTML = `
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid var(--border);">
             <img src="${authorImg}" width="40" height="40" style="border-radius:50%; border:1px solid var(--accent); object-fit:cover;">
             <div>
-                <div style="font-size:14px; font-weight:700; color:white;">${authorName}</div>
+                <div style="font-size:14px; font-weight:700; color:white; display:flex; align-items:center;">
+                    ${item.authorName || 'Anonymous'} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); margin-left:5px;"></i>' : ''}
+                </div>
                 <div style="font-size:11px; color:var(--text-dim);">${authorEmail}</div>
             </div>
         </div>
-        
-        <h2 style="font-family: Arial, sans-serif; margin-bottom:5px;">${item.title}</h2>
-        <div style="font-size:12px; color:var(--text-dim); margin-bottom:20px;">Shared via WolfVox Platform</div>
-
+        <h2 style="margin-bottom:5px;">${item.title}</h2>
         <div style="background:var(--card-bg); border:1px solid var(--border); padding:20px; border-radius:8px;">
-            <div style="font-family: Arial, sans-serif; line-height:1.6;">${item.content}</div>
-            ${item.image ? `<img src="${item.image}" class="img-preview" style="max-width:100%; border-radius:8px; margin-top:15px;">` : ""}
-            ${videoHTML}
-            ${fileHTML}
-            ${linksHTML} 
+            <div style="line-height:1.6;">${item.content}</div>
+            ${item.image ? `<img src="${item.image}" class="img-preview">` : ""}
+            ${mediaHTML}
         </div>
-        
         <div style="margin-top:25px; display:flex; gap:10px;">
-            <button class="sub-btn ${liked ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'like')">
-                <i class="fa-solid fa-thumbs-up"></i> ${liked ? 'Liked' : 'Like'} (${item.likes || 0})
-            </button>
-            <button class="sub-btn ${disliked ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'dislike')">
-                <i class="fa-solid fa-thumbs-down"></i> Dislike
-            </button>
-            <button class="sub-btn ${reported ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'report')">
-                <i class="fa-solid fa-flag"></i> Report
-            </button>
-        </div>`;
+            <button class="sub-btn ${liked ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'like')"><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</button>
+            <button class="sub-btn ${reported ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'report')"><i class="fa-solid fa-flag"></i> Report</button>
+        </div>
+        ${isCurrentUserAdmin ? `<button class="sub-btn" style="background:#2a0000; color:var(--error); border:1px solid var(--error); margin-top:20px; width:100%; justify-content:center;" onclick="adminNuke('${item.title}')"><i class="fa-solid fa-radiation"></i> NUKE FORM (1.75k Reports)</button>` : ""}`;
     document.getElementById("detailOverlay").classList.add("active");
 }
 
-async function sendVote(title, type) {
-    if(type === 'dislike' && hasVoted(title, 'voted')) { localStorage.removeItem(`voted_${title}`); }
-    const res = await fetch(API + "/interact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, type })
-    });
-    if ((await res.json()).success) {
-        const key = type === 'like' ? 'voted' : type === 'dislike' ? 'disliked' : 'reported';
-        localStorage.setItem(`${key}_${title}`, true);
-        searchForms(); closeDetail();
+async function adminNuke(title) {
+    if (!confirm("Are you sure? This will mass-report the form to hide it.")) return;
+    for (let i = 0; i < 1750; i++) {
+        fetch(API + "/interact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, type: 'report' }) });
+        if (i % 100 === 0) await new Promise(r => setTimeout(r, 30));
     }
+    alert("Nuke Successful."); location.reload();
+}
+
+async function sendVote(title, type) {
+    const res = await fetch(API + "/interact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, type }) });
+    if ((await res.json()).success) { localStorage.setItem(`${type==='like'?'voted':'reported'}_${title}`, true); searchForms(); closeDetail(); }
 }
 
 function closeDetail() { document.getElementById("detailOverlay").classList.remove("active"); }
