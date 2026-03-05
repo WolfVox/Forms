@@ -320,13 +320,8 @@ function openDetail(index) {
                 <i class="fa-solid fa-flag"></i> Report
             </button>
         </div>
-${isCurrentUserAdmin ? `
-<button class="sub-btn"
-style="background:#2a0000; color:var(--error); border:1px solid var(--error); margin-top:20px; width:100%; justify-content:center;"
-onclick="sendVote('${item.title}', 'forceDelete')">
-<i class="fa-solid fa-radiation"></i> Force Delete
-</button>
-` : ""}
+        ${isCurrentUserAdmin ? `<button class="sub-btn" style="background:#2a0000; color:var(--error); border:1px solid var(--error); margin-top:20px; width:100%; justify-content:center;" onclick="sendVote('${item.title}', 'ForceDelete')"><i class="fa-solid fa-radiation"></i>ForceDelete</button>` : ""}`;
+    document.getElementById("detailOverlay").classList.add("active");
 }
 
 async function adminNuke(title, authorEmail) {
@@ -394,6 +389,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
