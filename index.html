@@ -161,7 +161,7 @@
     <div class="sitemap-col"><h4>Legal</h4><a href="#">Privacy</a><a href="#">Terms</a></div>
 </div>
 
-<footer>&copy; 2026 WolfVoxCo. | Community Forms.</footer>
+<footer>&copy; 2026 WolfVoxCo | Community Forms.</footer>
 
 <script>
 const API = "https://backhand-forms.onrender.com/api/forms";
@@ -320,67 +320,60 @@ function openDetail(index) {
                 <i class="fa-solid fa-flag"></i> Report
             </button>
         </div>
-        ${isCurrentUserAdmin ? `<button class="sub-btn" style="background:#2a0000; color:var(--error); border:1px solid var(--error); margin-top:20px; width:100%; justify-content:center;" onclick="sendVote('${item.title}', 'ForceDelete')"><i class="fa-solid fa-radiation"></i>ForceDelete</button>` : ""}`;
+        ${isCurrentUserAdmin ? `<button class="sub-btn" style="background:#2a0000; color:var(--error); border:1px solid var(--error); margin-top:20px; width:100%; justify-content:center;" onclick="adminNuke('${item.title}')"><i class="fa-solid fa-radiation"></i> REMOVE FORM (Admin Nuke)</button>` : ""}`;
     document.getElementById("detailOverlay").classList.add("active");
 }
 
-async function adminNuke(title, authorEmail) {
+async function adminNuke(title, email) {
 
-
-if (!user || user.email !== ADMIN_EMAIL) {
-    alert("Admin only.");
-    return;
-}
-
-if (!confirm("NUKE this post? This will report it 10 times.")) return;
-
-try {
-
-    for (let i = 0; i < 10; i++) {
-        await sendVote(title, authorEmail, "report");
-    }
-
-    alert("Post nuked.");
-
-    searchForms();
-    closeDetail();
-
-} catch (err) {
-    console.error("Admin nuke error:", err);
-}
-
-
-}
-
-async function sendVote(title, email, type) {
+    if (!confirm("Are you sure you want to remove this form?")) return;
 
     try {
 
-        const res = await fetch(API + "/interact", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                title: title,
-                email: email,
-                type: type
-            })
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-            console.log("Vote success:", type);
-            searchForms();
-        } else {
-            console.error("Vote rejected:", data);
+        for (let i = 0; i < 10; i++) {
+            await sendVote(title, email, "report");
+            await new Promise(r => setTimeout(r, 80));
         }
 
+        console.log("Admin nuke finished");
+
+        searchForms();
+
     } catch (err) {
-        console.error("Vote error:", err);
+        console.error("Admin nuke failed:", err);
+    }
+}
+async function sendVote(title, email, type) {
+
+    // if user dislikes but already liked, remove like
+    if(type === 'dislike' && hasVoted(title, 'voted')) {
+        localStorage.removeItem(`voted_${title}`);
     }
 
-}
+    const res = await fetch(API + "/interact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            title: title,
+            authorEmail: email,
+            type: type
+        })
+    });
 
+    const data = await res.json();
+
+    if (data.success) {
+
+        // store vote locally
+        localStorage.setItem(
+            `${type === 'like' ? 'voted' : type === 'dislike' ? 'disliked' : 'reported'}_${title}`,
+            true
+        );
+
+        searchForms();
+        closeDetail();
+    }
+}
 
 function closeDetail() { document.getElementById("detailOverlay").classList.remove("active"); }
 
@@ -389,11 +382,5 @@ searchForms();
 </script>
 </body>
 </html>
-
-
-
-
-
-
 
 
