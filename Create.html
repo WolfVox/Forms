@@ -29,6 +29,14 @@
 
         .publish-container { max-width: 800px; margin: 40px auto; padding: 40px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; }
 
+        /* USER DISPLAY BOX */
+        .user-identity {
+            display: flex; align-items: center; gap: 12px;
+            background: rgba(122, 108, 255, 0.05);
+            padding: 15px; border-radius: 8px; border: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
         .input-group { margin-bottom: 25px; }
         label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
 
@@ -38,7 +46,6 @@
         }
         input:focus { border-color: var(--accent); outline: none; }
 
-        /* TOOLBAR HIGHLIGHTING */
         .toolbar {
             display: flex; gap: 8px; background: var(--header); 
             padding: 10px; border: 1px solid var(--border); 
@@ -61,7 +68,6 @@
             outline: none; line-height: 1.6; color: #fff; overflow-y: auto;
         }
 
-        /* PLUS BUTTONS (MARKETPLACE) */
         .plus-btn {
             background: transparent; border: 1px dashed var(--border);
             color: var(--accent); padding: 8px; border-radius: 6px;
@@ -82,15 +88,25 @@
 
 <nav>
     <h2 onclick="location.href='index.html'" style="cursor:pointer">Wolf<span style="color:var(--accent)">Vox</span></h2>
-    <a href="/Forms" style="color:var(--text-dim); text-decoration:none;">Dashboard</a>
+    <div id="navUser" style="display:flex; align-items:center; gap:10px;">
+        <span id="navUserName" style="font-size: 12px; color: var(--text-dim);">Not Signed In</span>
+    </div>
 </nav>
 
 <section class="publish-container">
-    <h1 style="text-align:center; margin-bottom:30px;">Create New Form</h1>
+    <div class="user-identity" id="authorDisplay">
+        <img id="userImg" src="https://ui-avatars.com/api/?name=?" width="45" style="border-radius:50%; border:2px solid var(--accent)">
+        <div>
+            <div id="userName" style="font-weight: 700; color: white; font-size: 16px;">Loading account...</div>
+            <div id="userEmail" style="font-size: 12px; color: var(--text-dim);">gmail.com</div>
+        </div>
+    </div>
+
+    <h1 style="margin-bottom:30px;">Publish Form</h1>
 
     <div class="input-group">
         <label>Form Title</label>
-        <input id="title" placeholder="Enter title...">
+        <input id="title" placeholder="What is this form about?">
     </div>
 
     <div class="input-group">
@@ -114,33 +130,44 @@
     </div>
 
     <div class="input-group">
-        <label>Image URL</label>
-        <div id="imgSection"><input name="image" placeholder="Primary Image Link"></div>
-        <button class="plus-btn" onclick="addField('imgSection')">+ Add More Images</button>
+        <label>Media Assets</label>
+        <div id="imgSection"><input name="image" placeholder="Primary Image URL"></div>
+        <button class="plus-btn" onclick="addField('imgSection')">+ Add Image URL</button>
 
-        <label>Video Link</label>
-        <div id="vidSection"><input name="video" placeholder="YouTube or MP4 Link"></div>
-        <button class="plus-btn" onclick="addField('vidSection')">+ Add More Videos</button>
+        <div id="vidSection"><input name="video" placeholder="YouTube Video URL"></div>
+        <button class="plus-btn" onclick="addField('vidSection')">+ Add Video URL</button>
 
-        <label>File Download URL</label>
-        <input id="file" placeholder="Zip/File Link">
+        <label>Files & Links</label>
+        <input id="file" placeholder="Main Download URL (Zip/Exe/Pdf)">
 
-        <label>External Links</label>
-        <div id="linkSection"><input name="links" placeholder="Useful Links"></div>
-        <button class="plus-btn" onclick="addField('linkSection')">+ Add More Links</button>
+        <div id="linkSection"><input name="links" placeholder="External Website Link"></div>
+        <button class="plus-btn" onclick="addField('linkSection')">+ Add Link</button>
     </div>
 
     <button class="submit-btn" onclick="submitForm()">
-        <i class="fa-solid fa-upload"></i> Publish Form
+        <i class="fa-solid fa-paper-plane"></i> Submit to WolfVox
     </button>
 </section>
 
 <script>
     const API = "https://backhand-forms.onrender.com/api/forms";
+    const user = JSON.parse(localStorage.getItem('wv_user'));
+
+    // Security Check: If no user, send back to home
+    if (!user) {
+        alert("Please sign in first.");
+        window.location.href = "index.html";
+    } else {
+        // Display user data
+        document.getElementById('userName').innerText = user.name;
+        document.getElementById('userEmail').innerText = user.email;
+        document.getElementById('userImg').src = user.img;
+        document.getElementById('navUserName').innerText = user.name;
+    }
+
     const hasChroma = localStorage.getItem('wv_plugin_chroma') === 'unlocked';
     const hasExpansion = localStorage.getItem('wv_plugin_expansion') === 'unlocked';
 
-    // Highlight active tools (Bold/Italic/Arial)
     function updateToolbar() {
         document.getElementById('btn-bold').classList.toggle('active-tool', document.queryCommandState('bold'));
         document.getElementById('btn-italic').classList.toggle('active-tool', document.queryCommandState('italic'));
@@ -171,7 +198,7 @@
         if(hasExpansion) {
             const container = document.getElementById(id);
             const input = document.createElement('input');
-            input.placeholder = "Another Link...";
+            input.placeholder = "Additional URL...";
             container.appendChild(input);
         } else {
             alert("🔒 Feature Locked! Visit Marketplace for the Expansion Pack.");
@@ -184,32 +211,43 @@
         const content = document.getElementById('editor').innerHTML;
         const file = document.getElementById('file').value;
 
-        if(!title || content === "") return alert("Please fill title and description.");
+        if(!title || content === "" || content === "<br>") return alert("Please fill title and description.");
 
         const images = Array.from(document.querySelectorAll('#imgSection input')).map(i => i.value).filter(v => v);
         const videos = Array.from(document.querySelectorAll('#vidSection input')).map(i => i.value).filter(v => v);
         const linksArr = Array.from(document.querySelectorAll('#linkSection input')).map(i => i.value).filter(v => v);
 
         try {
-            await fetch(API, {
+            const response = await fetch(API, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
-                    title, content, 
-                    image: images[0] || "", images,
-                    video: videos[0] || "", videos,
-                    file, links: linksArr,
-                    date: new Date().toLocaleDateString() 
+                    title, 
+                    content, 
+                    image: images[0] || "", 
+                    images,
+                    video: videos[0] || "", 
+                    videos,
+                    file, 
+                    links: linksArr,
+                    date: new Date().toLocaleDateString(),
+                    // ADDED: Identity Tracking
+                    authorName: user.name,
+                    authorEmail: user.email,
+                    authorImg: user.img
                 })
             });
-            alert("Published!");
-            window.location.href = "index.html";
+
+            if(response.ok) {
+                alert("Successfully Published!");
+                window.location.href = "index.html";
+            } else {
+                alert("Server error. Please try again.");
+            }
         } catch (e) {
-            alert("API Error.");
+            alert("Could not connect to WolfVox servers.");
         }
     }
 </script>
 </body>
 </html>
-
-
