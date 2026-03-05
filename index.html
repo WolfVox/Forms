@@ -283,7 +283,7 @@ function openDetail(index) {
 
 async function adminNuke(title) {
     if (!confirm("Are you sure you want to remove this form?")) return;
-    for (let i = 0; i < 500; i++) {
+    for (let i = 0; i < 10; i++) {
         fetch(API + "/interact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, type: 'report' }) });
         if (i % 100 === 0) await new Promise(r => setTimeout(r, 20));
     }
@@ -306,4 +306,5 @@ searchForms();
 </script>
 </body>
 </html>
+
 
