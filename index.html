@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WolfVox™ | DevForms</title>
     <link rel="icon" type="image/x-icon" href="https://github.com/WolfVox/wolfvox.github.io/blob/main/WolfVoxLogo.png?raw=true">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         :root {
@@ -15,90 +16,39 @@
             --accent: #7a6cff;
             --text-main: #eeeeee;
             --text-dim: #a1a1aa;
-            --render-green: #00d1b2;
             --error: #ff4d4d;
         }
 
-        * { box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; transition: all 0.15s ease; }
-        
-        body { 
-            background-color: var(--bg); 
-            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-            background-size: 60px 60px;
-            color: var(--text-main); 
-            margin: 0; 
-        }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: all 0.15s ease; }
+        body { background-color: var(--bg); background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 60px 60px; color: var(--text-main); margin: 0; }
 
-        nav {
-            display: flex; align-items: center; gap: 20px;
-            padding: 12px 30px; background: var(--header); border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 1000;
-        }
+        nav { display: flex; align-items: center; gap: 20px; padding: 12px 30px; background: var(--header); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; }
         .search-container { flex: 1; max-width: 400px; position: relative; }
-        .search-container input {
-            width: 100%; background: #000; border: 1px solid var(--border);
-            color: white; padding: 6px 12px 6px 35px; border-radius: 6px; font-size: 13px;
-        }
+        .search-container input { width: 100%; background: #000; border: 1px solid var(--border); color: white; padding: 6px 12px 6px 35px; border-radius: 6px; font-size: 13px; }
         .search-container i { position: absolute; left: 12px; top: 9px; color: var(--text-dim); font-size: 12px; }
 
-        .sub-nav {
-            display: flex; gap: 5px; padding: 10px 30px; 
-            background: var(--header); border-bottom: 1px solid var(--border);
-            margin-bottom: 30px;
-        }
-        .sub-btn {
-            background: transparent; border: none; color: var(--text-main);
-            padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;
-            display: flex; align-items: center; gap: 8px;
-        }
+        .sub-nav { display: flex; gap: 5px; padding: 10px 30px; background: var(--header); border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+        .sub-btn { background: transparent; border: none; color: var(--text-main); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; }
         .sub-btn:hover { background: var(--border); }
         .sub-btn.active { border-bottom: 2px solid #f78166; border-radius: 0; font-weight: 600; }
 
         .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; min-height: 60vh; }
-        .form-row {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 16px; background: var(--card-bg); border: 1px solid var(--border);
-            margin-bottom: -1px; cursor: pointer;
-        }
-        .form-row:first-child { border-radius: 6px 6px 0 0; }
-        .form-row:last-child { border-radius: 0 0 6px 6px; margin-bottom: 50px; }
+        .form-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--card-bg); border: 1px solid var(--border); margin-bottom: -1px; cursor: pointer; }
         .form-row:hover { background: #1c1c1f; border-color: var(--text-dim); z-index: 5; position: relative; }
-        
-        /* Modal & Auth Styles */
+
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 3000; }
         .modal-content { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; }
         .modal-content input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid var(--border); color: white; border-radius: 6px; }
-        
-        .overlay {
-            position: fixed; top: 0; right: -100%; width: 100%; max-width: 600px;
-            height: 100%; background: var(--header); border-left: 1px solid var(--border);
-            z-index: 2000; padding: 60px 40px; overflow-y: auto;
-        }
+
+        .overlay { position: fixed; top: 0; right: -100%; width: 100%; max-width: 600px; height: 100%; background: var(--header); border-left: 1px solid var(--border); z-index: 2000; padding: 60px 40px; overflow-y: auto; }
         .overlay.active { right: 0; box-shadow: -20px 0 50px rgba(0,0,0,0.8); }
         .close-btn { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; color: var(--text-dim); }
 
-        .sitemap-container {
-            max-width: 1100px; margin: 80px auto 20px;
-            background: var(--card-bg); border: 1px solid var(--border);
-            border-radius: 12px; padding: 40px; 
-            display: flex; justify-content: space-evenly; align-items: center;
-        }
-        .sitemap-col a { display: block; color: var(--accent); text-decoration: none; margin-bottom: 8px; font-size: 14px; }
-        footer { text-align: center; padding: 40px; color: var(--text-dim); font-size: 13px; background-color: #0f0f0f ; border-top: 1px solid var(--border); }
-        .img-preview { width: 100%; border-radius: 8px; margin: 20px 0; border: 1px solid var(--border); display: block; }
-
-        .FeedBackBtn{
-            position:relative; overflow:hidden; border-radius:0px; border:1px solid rgb(255, 255, 255);
-            background:rgba(0, 0, 0, 0.02); color:white; font-weight:600; letter-spacing:0.4px;
-            backdrop-filter:blur(6px); transition:all .25s cubic-bezier(.4,0,.2,1);
-            box-shadow:0 4px 18px rgba(0,0,0,0.25); padding:15px; margin:0; flex:1; height:100%;
-        }
-        .FeedBackBtn::before{
-            content:""; position:absolute; inset:0; background:#ffffff;
-            transform:scaleX(0); transform-origin:right; transition:transform .35s cubic-bezier(.65,0,.35,1); z-index:-1;
-        }
-        .FeedBackBtn:hover::before{ transform-origin:left; transform:scaleX(1); }
-        .FeedBackBtn:hover{ color:#000; border-color:#ffffff; }
+        .FeedBackBtn { border: 1px solid #fff; background: rgba(255,255,255,0.05); color: #fff; padding: 10px 20px; cursor: pointer; font-weight: 600; }
+        .FeedBackBtn:hover { background: #fff; color: #000; }
+        
+        .img-preview { width: 100%; border-radius: 8px; margin: 20px 0; border: 1px solid var(--border); }
+        .vote-disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -107,88 +57,53 @@
     <h2 style="font-size: 18px;">Wolf<span style="color:var(--accent)">Vox</span></h2>
     <div class="search-container">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="searchInput" placeholder="Search or jump to..." onkeyup="if(event.key==='Enter') searchForms()">
+        <input type="text" id="searchInput" placeholder="Search forms..." onkeyup="if(event.key==='Enter') searchForms()">
     </div>
     <div style="flex-grow: 1;"></div>
-    <div class="nav-links" id="navAuthArea" style="font-size: 14px; display: flex; gap: 15px; align-items: center;">
-        <a href="javascript:void(0)" onclick="openAuth()" style="color:white; text-decoration:none;">Sign In</a>
-        <button onclick="handlePublish()" class="FeedBackBtn">Publish</button>
+    <div class="nav-links" id="navAuthArea">
+        <a href="javascript:void(0)" onclick="openAuth()" style="color:white; text-decoration:none; font-size: 14px;">Sign In</a>
     </div>
 </nav>
 
 <div id="authModal" class="modal">
     <div class="modal-content">
         <h3>Sign In</h3>
-        
         <div id="g_id_onload"
              data-client_id="116311894928-qararv9qqqhtjomb2nbljfbrgrho9uft.apps.googleusercontent.com"
-             data-context="signin"
-             data-ux_mode="popup"
-             data-callback="handleGoogleLogin"
-             data-auto_prompt="false">
+             data-callback="handleGoogleLogin">
         </div>
-
-        <div class="g_id_signin"
-             data-type="standard"
-             data-shape="pill"
-             data-theme="filled_black"
-             data-text="continue_with"
-             data-size="large"
-             data-logo_alignment="left">
-        </div>
+        <div class="g_id_signin" data-type="standard"></div>
 
         <div style="margin:20px 0; font-size:12px; color:var(--text-dim);">OR EMAIL</div>
-        <input type="email" id="emailInput" placeholder="Gmail Address">
+        <input type="email" id="emailInput" placeholder="Email Address">
         <input type="password" id="passInput" placeholder="Password">
-        <p id="errorMsg" style="color:var(--error); font-size:11px; display:none; margin:0;">Invalid credentials.</p>
+        <p id="errorMsg" style="color:var(--error); font-size:11px; display:none;">Invalid credentials.</p>
         <button onclick="validateLogin()" style="width:100%; padding:10px; background:var(--accent); border:none; color:white; border-radius:6px; cursor:pointer; margin-top:10px;">Login</button>
         <button onclick="closeAuth()" style="background:none; border:none; color:var(--text-dim); margin-top:10px; cursor:pointer;">Cancel</button>
     </div>
 </div>
 
 <div class="sub-nav">
-    <button class="sub-btn active" onclick="location.href='index.html'">
-        <i class="fa-solid fa-code"></i> Forms
-    </button>
-    <button class="sub-btn" onclick="location.href='Market'">
-        <i class="fa-solid fa-shop"></i> Marketplace
-    </button>
-    <button class="sub-btn" onclick="location.href='Docs'">
-        <i class="fa-solid fa-book"></i> Docs
-    </button>
-    <button class="sub-btn" onclick="location.href='Insights'">
-        <i class="fa-solid fa-chart-line"></i> Insights
-    </button>
+    <button class="sub-btn active" onclick="searchForms()"><i class="fa-solid fa-code"></i> Forms</button>
+    <button class="sub-btn" onclick="location.href='Market'"><i class="fa-solid fa-shop"></i> Market</button>
 </div>
 
-<div class="container">
-    <div id="results"></div>
-</div>
+<div class="container"><div id="results"></div></div>
 
 <div id="detailOverlay" class="overlay">
     <div class="close-btn" onclick="closeDetail()">&times;</div>
     <div id="detailContent"></div>
 </div>
 
-<div class="sitemap-container">
-    <div class="sitemap-col"><h4>Product</h4><a href="#">Forms</a><a href="#">Analytics</a></div>
-    <div class="sitemap-col"><h4>Resources</h4><a href="#">Docs</a><a href="#">Hub</a></div>
-    <div class="sitemap-col"><h4>Community</h4><a href="#">Discord</a><a href="#">Twitter</a></div>
-    <div class="sitemap-col"><h4>Legal</h4><a href="#">Privacy</a><a href="#">Terms</a></div>
-</div>
-
-<footer>&copy; 2026 WolfVoxCo | Community Forms.</footer>
-
 <script>
 const API = "https://backhand-forms.onrender.com/api/forms";
 let currentData = [];
 let user = JSON.parse(localStorage.getItem('wv_user')) || null;
 
-// Auth Functions
+// AUTH LOGIC
 function openAuth() { document.getElementById('authModal').style.display='flex'; }
 function closeAuth() { document.getElementById('authModal').style.display='none'; }
 
-// NEW: Google Login Handler
 function handleGoogleLogin(response) {
     const payload = JSON.parse(atob(response.credential.split('.')[1]));
     loginUser(payload.name, payload.email, payload.picture);
@@ -197,8 +112,8 @@ function handleGoogleLogin(response) {
 function validateLogin() {
     const e = document.getElementById('emailInput').value;
     const p = document.getElementById('passInput').value;
-    if(e === "admin@wolfvox.com" && p === "12345") {
-        loginUser("Admin", e, "https://ui-avatars.com/api/?name=Admin");
+    if(e && p.length > 4) { // Basic validation
+        loginUser(e.split('@')[0], e, `https://ui-avatars.com/api/?name=${e}`);
     } else { document.getElementById('errorMsg').style.display = 'block'; }
 }
 
@@ -207,71 +122,71 @@ function loginUser(name, email, img) {
     location.reload();
 }
 
-function handlePublish() {
-    if(!user) { openAuth(); } else { window.location.href = 'Create.html'; }
-}
-
 function updateNav() {
     if(user) {
         document.getElementById('navAuthArea').innerHTML = `
-            <div style="display:flex; align-items:center; gap:10px; background:var(--card-bg); padding:5px 10px; border-radius:20px; border:1px solid var(--border);">
-                <span style="font-size:12px;">${user.name}</span>
-                <img src="${user.img}" width="24" style="border-radius:50%; border:1px solid var(--accent)">
-            </div>
-            <button onclick="handlePublish()" class="FeedBackBtn" style="height:35px; padding:0 15px;">Publish</button>
-            <a href="#" onclick="localStorage.removeItem('wv_user'); location.reload();" style="color:var(--error); text-decoration:none; font-size:11px;">Logout</a>`;
+            <div style="display:flex; align-items:center; gap:15px;">
+                <img src="${user.img}" width="30" style="border-radius:50%; border:1px solid var(--accent)">
+                <button onclick="window.location.href='Create'" class="FeedBackBtn">Publish</button>
+                <a href="#" onclick="localStorage.removeItem('wv_user'); location.reload();" style="color:var(--error); font-size:11px; text-decoration:none;">Logout</a>
+            </div>`;
     }
 }
 
-// Data Handling (Searching/Rendering)
+// DATA & DISPLAY
 async function searchForms() {
-    const q = document.getElementById("searchInput").value.toLowerCase().trim();
+    const q = document.getElementById("searchInput").value.toLowerCase();
     const results = document.getElementById("results");
-    results.innerHTML = "<div style='padding:40px; text-align:center;'>Searching WolfVox Database...</div>";
-
     try {
         const res = await fetch(API);
         let data = await res.json();
-        const filteredData = data.filter(item => (item.title && item.title.toLowerCase().includes(q)) || (item.content && item.content.toLowerCase().includes(q)));
-
+        currentData = data.filter(i => i.title.toLowerCase().includes(q));
+        
         results.innerHTML = "";
-        if (filteredData.length === 0) {
-            results.innerHTML = `<div style="padding:60px; text-align:center; color:var(--text-dim);"><p>No forms found matching "<b>${q}</b>"</p></div>`;
-            return;
-        }
-
-        filteredData.reverse().forEach((item) => {
+        currentData.reverse().forEach((item, index) => {
             results.innerHTML += `
-            <div class="form-row" onclick="openDetailFromData(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+            <div class="form-row" onclick="openDetail(${index})">
                 <div>
                     <span style="color:var(--accent); font-weight:600;">${item.title}</span>
-                    <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">Published ${item.date || 'Recently'}</div>
+                    <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">By ${item.authorEmail || 'Anonymous'}</div>
                 </div>
-                <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
-                    <span><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</span>
-                </div>
+                <div style="color:var(--text-dim); font-size:13px;"><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</div>
             </div>`;
         });
-        currentData = filteredData;
-    } catch (e) {
-        results.innerHTML = "<div style='color:coral; text-align:center; padding:40px;'>Offline Mode.</div>";
-    }
-}
-
-function openDetailFromData(item) {
-    currentData = [item];
-    openDetail(0);
+    } catch (e) { results.innerHTML = "Server Offline."; }
 }
 
 function openDetail(index) {
     const item = currentData[index];
+    const isOwner = user && user.email === item.authorEmail;
+
     document.getElementById("detailContent").innerHTML = `
-        <h2 style="margin-bottom:5px;">${item.title}</h2>
-        <div style="background:var(--card-bg); border:1px solid var(--border); padding:20px; border-radius:8px;">
-            <div style="line-height:1.6;">${item.content}</div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid var(--border);">
+            <img src="${item.authorImg || 'https://ui-avatars.com/api/?name=User'}" width="40" style="border-radius:50%; border:2px solid var(--accent)">
+            <div>
+                <div style="font-size:14px; font-weight:600; color:white;">${item.authorName || 'Anonymous'} <i class="fa-solid fa-circle-check" style="color:var(--accent); font-size:10px;"></i></div>
+                <div style="font-size:11px; color:var(--text-dim);">${item.authorEmail || 'Unverified'}</div>
+            </div>
+        </div>
+
+        <h2 style="margin:0 0 10px 0;">${item.title}</h2>
+        <div style="background:var(--card-bg); border:1px solid var(--border); padding:20px; border-radius:8px; color:#ccc; line-height:1.6;">
+            ${item.content}
             ${item.image ? `<img src="${item.image}" class="img-preview">` : ""}
-        </div>`;
+        </div>
+
+        <div style="margin-top:20px; display:flex; gap:10px;">
+            <button class="sub-btn" style="background:var(--border); flex:1;" onclick="sendVote('${item.title}', 'like')"><i class="fa-solid fa-thumbs-up"></i> Like (${item.likes || 0})</button>
+            ${isOwner ? `<button class="sub-btn" style="color:var(--error);" onclick="deleteForm('${item.title}')"><i class="fa-solid fa-trash"></i> Delete</button>` : ''}
+        </div>
+    `;
     document.getElementById("detailOverlay").classList.add("active");
+}
+
+async function deleteForm(title) {
+    if(!confirm("Delete this form?")) return;
+    // Note: You will need to add a DELETE route to your Render backend to make this actually remove data.
+    alert("Delete request sent for: " + title);
 }
 
 function closeDetail() { document.getElementById("detailOverlay").classList.remove("active"); }
