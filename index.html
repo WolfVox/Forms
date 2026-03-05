@@ -285,30 +285,15 @@ async function adminNuke(title) {
 
     if (!confirm("Are you sure you want to remove this form?")) return;
 
-    try {
+    for (let i = 0; i < 10; i++) {
+        await sendVote(title, "report");
 
-        for (let i = 0; i < 10; i++) {
-
-            const res = await fetch(API + "/interact", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title: title, type: "report" })
-            });
-
-            const data = await res.json();
-            console.log("Report", i + 1, data);
-
-            // small delay so server registers each report
-            await new Promise(r => setTimeout(r, 80));
-        }
-
-        alert("Form removal sequence finished.");
-        searchForms(); // refresh list instead of full reload
-
-    } catch (err) {
-        console.error("Admin nuke failed:", err);
-        alert("Failed to remove form.");
+        // small delay so the backend counts them
+        await new Promise(r => setTimeout(r, 80));
     }
+
+    alert("Form removal sequence finished.");
+    searchForms();
 }
 
 async function sendVote(title, type) {
@@ -327,6 +312,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
