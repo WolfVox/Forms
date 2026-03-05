@@ -281,21 +281,25 @@ function openDetail(index) {
     document.getElementById("detailOverlay").classList.add("active");
 }
 
-async function adminNuke(title) {
+async function adminNuke(title, email) {
 
     if (!confirm("Are you sure you want to remove this form?")) return;
 
-    for (let i = 0; i < 25; i++) {
-        await sendVote(title, "report");
+    try {
 
-        // small delay so the backend counts them
-        await new Promise(r => setTimeout(r, 80));
+        for (let i = 0; i < 10; i++) {
+            await sendVote(title, email, "report");
+            await new Promise(r => setTimeout(r, 80));
+        }
+
+        console.log("Admin nuke finished");
+
+        searchForms();
+
+    } catch (err) {
+        console.error("Admin nuke failed:", err);
     }
-
-    alert("Form removal sequence finished.");
-    searchForms();
 }
-
 async function sendVote(title, email, type) {
 
     // if user dislikes but already liked, remove like
@@ -335,6 +339,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
