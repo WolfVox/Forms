@@ -6,8 +6,6 @@
     <title>WolfVox™ | DevForms</title>
     <link rel="icon" type="image/x-icon" href="https://github.com/WolfVox/wolfvox.github.io/blob/main/WolfVoxLogo.png?raw=true">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
     <style>
         :root {
             --bg: #060608;
@@ -111,7 +109,7 @@
 <body>
 
 <nav>
-    <h2 style="font-size: 18px; margin:0;">Wolf<span style="color:var(--accent)">Vox</span></h2>
+    <h2 style="font-size: 18px;">Wolf<span style="color:var(--accent)">Vox</span></h2>
     <div class="search-container">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" id="searchInput" placeholder="Search or jump to..." onkeyup="if(event.key==='Enter') searchForms()">
@@ -214,8 +212,8 @@ function updateNav() {
     if(user) {
         document.getElementById('navAuthArea').innerHTML = `
             <div style="display:flex; align-items:center; gap:10px;">
-                <span style="font-size:12px; color:white;">${user.name}</span>
-                <img src="${user.img}" width="30" height="30" style="border-radius:50%; border:2px solid var(--accent); object-fit:cover;">
+                <span style="font-size:12px;">${user.name}</span>
+                <img src="${user.img}" width="24" style="border-radius:50%; border:1px solid var(--accent)">
             </div>
             <button onclick="handlePublish()" class="FeedBackBtn" style="height:auto; padding:8px 15px;">Publish</button>
             <a href="#" onclick="localStorage.removeItem('wv_user'); location.reload();" style="color:var(--error); text-decoration:none; font-size:11px;">Logout</a>`;
@@ -258,7 +256,7 @@ async function searchForms() {
         });
         currentData = filteredData;
     } catch (e) {
-        results.innerHTML = "<div style='color:coral; text-align:center; padding:40px;'>Search Offline. Check API connection.</div>";
+        results.innerHTML = "<div style='color:coral; text-align:center; padding:40px;'>Search Offline.</div>";
     }
 }
 
@@ -275,7 +273,6 @@ function openDetail(index) {
     const disliked = hasVoted(item.title, 'disliked');
     const reported = hasVoted(item.title, 'reported');
     
-    // 1. YouTube Player Logic
     let videoHTML = "";
     if (item.video) {
         let vidId = "";
@@ -286,14 +283,12 @@ function openDetail(index) {
         }
     }
 
-    // 2. File Download Box
     let fileHTML = item.file ? `
         <div style="margin-top:20px; padding:12px; background:#000; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:space-between;">
             <div style="font-size:13px;"><i class="fa-solid fa-file-arrow-down" style="color:var(--accent)"></i> ${item.file.split('/').pop()}</div>
             <a href="${item.file}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600; font-size:12px;">Download Attachment</a>
         </div>` : "";
 
-    // 3. External Links Logic
     let linksHTML = "";
     if (item.links && item.links.length > 0) {
         linksHTML = `<div style="margin-top:20px; display:flex; flex-wrap:wrap; gap:8px;">`;
@@ -309,16 +304,7 @@ function openDetail(index) {
         linksHTML += `</div>`;
     }
 
-    // 4. Render Everything
     document.getElementById("detailContent").innerHTML = `
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid var(--border);">
-            <img src="${item.authorImg || 'https://ui-avatars.com/api/?name=User'}" width="40" height="40" style="border-radius:50%; border:2px solid var(--accent)">
-            <div>
-                <div style="font-size:14px; font-weight:600; color:white;">${item.authorName || 'Anonymous User'} <i class="fa-solid fa-circle-check" style="color:var(--accent); font-size:10px;"></i></div>
-                <div style="font-size:11px; color:var(--text-dim);">${item.authorEmail || 'unverified@wolfvox.com'}</div>
-            </div>
-        </div>
-
         <h2 style="font-family: Arial, sans-serif; margin-bottom:5px;">${item.title}</h2>
         <div style="font-size:12px; color:var(--text-dim); margin-bottom:20px;">Shared via WolfVox Platform</div>
 
@@ -331,13 +317,13 @@ function openDetail(index) {
         </div>
         
         <div style="margin-top:25px; display:flex; gap:10px;">
-            <button class="sub-btn ${liked ? 'vote-disabled' : ''}" style="background:var(--border); flex:1; justify-content:center;" onclick="sendVote('${item.title}', 'like')">
+            <button class="sub-btn ${liked ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'like')">
                 <i class="fa-solid fa-thumbs-up"></i> ${liked ? 'Liked' : 'Like'} (${item.likes || 0})
             </button>
-            <button class="sub-btn ${disliked ? 'vote-disabled' : ''}" style="background:var(--border); flex:1; justify-content:center;" onclick="sendVote('${item.title}', 'dislike')">
+            <button class="sub-btn ${disliked ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'dislike')">
                 <i class="fa-solid fa-thumbs-down"></i> Dislike
             </button>
-            <button class="sub-btn ${reported ? 'vote-disabled' : ''}" style="background:var(--border); flex:1; justify-content:center;" onclick="sendVote('${item.title}', 'report')">
+            <button class="sub-btn ${reported ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'report')">
                 <i class="fa-solid fa-flag"></i> Report
             </button>
         </div>`;
