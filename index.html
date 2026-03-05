@@ -282,12 +282,25 @@ function openDetail(index) {
 }
 
 async function adminNuke(title) {
+
     if (!confirm("Are you sure you want to remove this form?")) return;
+
+    const reports = [];
+
     for (let i = 0; i < 10; i++) {
-        fetch(API + "/interact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, type: 'report' }) });
-        if (i % 100 === 0) await new Promise(r => setTimeout(r, 20));
+        reports.push(
+            fetch(API + "/interact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title: title, type: "report" })
+            })
+        );
     }
-    alert("Form removal sequence finished."); location.reload();
+
+    await Promise.all(reports);
+
+    alert("Form removal sequence finished.");
+    location.reload();
 }
 
 async function sendVote(title, type) {
@@ -306,5 +319,6 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
