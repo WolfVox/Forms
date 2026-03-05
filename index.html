@@ -352,44 +352,34 @@ try {
 
 }
 
-async function sendVote(title, emailOrType, maybeType) {
-
-    let email;
-    let type;
-
-    // detect if email was passed
-    if (maybeType) {
-        email = emailOrType;
-        type = maybeType;
-    } else {
-        email = null;
-        type = emailOrType;
-    }
+async function sendVote(title, type) {
 
     try {
 
-        const bodyData = {
-            title: title,
-            type: type
-        };
+        // toggle logic
+        if (type === "like") {
+            localStorage.removeItem(`disliked_${title}`);
+            localStorage.setItem(`voted_${title}`, true);
+        }
 
-        if(email) bodyData.authorEmail = email;
+        if (type === "dislike") {
+            localStorage.removeItem(`voted_${title}`);
+            localStorage.setItem(`disliked_${title}`, true);
+        }
+
+        if (type === "report") {
+            localStorage.setItem(`reported_${title}`, true);
+        }
 
         const res = await fetch(API + "/interact", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(bodyData)
+            body: JSON.stringify({ title, type })
         });
 
         const data = await res.json();
 
         if (data.success) {
-
-            localStorage.setItem(
-                `${type === 'like' ? 'voted' : type === 'dislike' ? 'disliked' : 'reported'}_${title}`,
-                true
-            );
-
             searchForms();
             closeDetail();
         }
@@ -407,6 +397,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
