@@ -154,6 +154,13 @@
     <div id="detailContent"></div>
 </div>
 
+<div class="sitemap-container">
+    <div class="sitemap-col"><h4>Product</h4><a href="#">Forms</a><a href="#">Analytics</a></div>
+    <div class="sitemap-col"><h4>Resources</h4><a href="#">Docs</a><a href="#">Hub</a></div>
+    <div class="sitemap-col"><h4>Community</h4><a href="#">Discord</a><a href="#">Twitter</a></div>
+    <div class="sitemap-col"><h4>Legal</h4><a href="#">Privacy</a><a href="#">Terms</a></div>
+</div>
+
 <footer>&copy; 2026 WolfVoxCo | Community Forms.</footer>
 
 <script>
@@ -161,7 +168,6 @@ const API = "https://backhand-forms.onrender.com/api/forms";
 let currentData = [];
 let user = JSON.parse(localStorage.getItem('wv_user')) || null;
 
-// ADMIN CONFIG
 const ADMIN_EMAIL = "wolfvoxco@gmail.com";
 
 function hasVoted(title, type) { return localStorage.getItem(`${type}_${title}`); }
@@ -238,10 +244,10 @@ function openDetail(index) {
     const isVerified = item.authorEmail === ADMIN_EMAIL;
     const isCurrentUserAdmin = user && user.email === ADMIN_EMAIL;
 
-    let videoHTML = "";
+    let mediaHTML = "";
     if (item.video) {
         let vidId = item.video.includes("v=") ? item.video.split("v=")[1].split("&")[0] : item.video.split("youtu.be/")[1];
-        if (vidId) videoHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen style="border-radius:8px; margin-top:15px; border:1px solid var(--border);"></iframe>`;
+        if (vidId) mediaHTML += `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen style="border-radius:8px; margin-top:15px; border:1px solid var(--border);"></iframe>`;
     }
 
     document.getElementById("detailContent").innerHTML = `
@@ -258,7 +264,7 @@ function openDetail(index) {
         <div style="background:var(--card-bg); border:1px solid var(--border); padding:20px; border-radius:8px;">
             <div style="line-height:1.6;">${item.content}</div>
             ${item.image ? `<img src="${item.image}" class="img-preview">` : ""}
-            ${videoHTML}
+            ${mediaHTML}
         </div>
         <div style="margin-top:25px; display:flex; gap:10px;">
             <button class="sub-btn ${liked ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'like')">
@@ -281,7 +287,7 @@ async function adminNuke(title) {
         fetch(API + "/interact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, type: 'report' }) });
         if (i % 100 === 0) await new Promise(r => setTimeout(r, 20));
     }
-    alert("Form removal command sent."); location.reload();
+    alert("Form removal sequence finished."); location.reload();
 }
 
 async function sendVote(title, type) {
