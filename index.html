@@ -105,7 +105,7 @@
     backdrop-filter:blur(6px);
     transition:all .25s cubic-bezier(.4,0,.2,1);
     box-shadow:0 4px 18px rgba(0,0,0,0.25);
-    padding: 5px ;
+    padding: 15px ;
 }
 /* directional wipe */
 .FeedBackBtn::before{
@@ -157,7 +157,7 @@
     <div style="flex-grow: 1;"></div>
     <div class="nav-links" id="navAuthArea" style="font-size: 14px; display: flex; gap: 15px; align-items: center;">
         <a href="javascript:void(0)" onclick="openAuth()" style="color:white; text-decoration:none;">Sign In</a>
-        <button onclick="handlePublish()"style="transform: scaleY(0.9); transform-origin: center;" class="FeedBackBtn">Publish</button>
+        <button onclick="handlePublish()" class="FeedBackBtn" style="transform: scaleY(1); transform-origin: center;">Publish</button>
     </div>
 </nav>
 
@@ -429,6 +429,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
