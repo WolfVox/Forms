@@ -161,7 +161,7 @@
     <div class="sitemap-col"><h4>Legal</h4><a href="#">Privacy</a><a href="#">Terms</a></div>
 </div>
 
-<footer>&copy; 2026 WolfVoxCo. | Community Forms.</footer>
+<footer>&copy; 2026 WolfVoxCo | Community Forms.</footer>
 
 <script>
 const API = "https://backhand-forms.onrender.com/api/forms";
@@ -324,41 +324,46 @@ function openDetail(index) {
     document.getElementById("detailOverlay").classList.add("active");
 }
 
-async function sendVote(title,email,type){
+async function sendVote(title, type) {
 
-try{
+    // If liking while disliked → remove dislike
+    if (type === 'like' && hasVoted(title, 'disliked')) {
+        localStorage.removeItem(`disliked_${title}`);
+    }
 
-const res = await fetch(API + "/interact",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-title:title,
-email:email,
-type:type
-})
-})
+    // If disliking while liked → remove like
+    if (type === 'dislike' && hasVoted(title, 'voted')) {
+        localStorage.removeItem(`voted_${title}`);
+    }
 
-const data = await res.json()
+    const res = await fetch(API + "/interact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, type })
+    });
 
-console.log(data)
+    const data = await res.json();
 
-searchForms()   // refresh likes
-closeDetail()
+    if (data.success) {
+        const key =
+            type === "like"
+                ? "voted"
+                : type === "dislike"
+                ? "disliked"
+                : "reported";
 
-}catch(err){
-console.error("Vote error:",err)
+        localStorage.setItem(`${key}_${title}`, true);
+
+        searchForms();
+        closeDetail();
+    }
 }
-
-}
-
 
 function closeDetail() { document.getElementById("detailOverlay").classList.remove("active"); }
 
 updateNav();
 searchForms();
-</script>
+</script> 
 </body>
 </html>
 
