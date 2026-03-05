@@ -320,13 +320,13 @@ function openDetail(index) {
                 <i class="fa-solid fa-flag"></i> Report
             </button>
         </div>
-        ${isCurrentUserAdmin ? `<button class="sub-btn" style="background:#2a0000; color:var(--error); border:1px solid var(--error); margin-top:20px; width:100%; justify-content:center;" onclick="adminNuke('${item.title}')"><i class="fa-solid fa-radiation"></i> REMOVE FORM (Admin Nuke)</button>` : ""}`;
+        ${isCurrentUserAdmin ? `<button class="sub-btn" style="background:#2a0000; color:var(--error); border:1px solid var(--error); margin-top:20px; width:100%; justify-content:center;" onclick="sendVote('${item.title}', 'Forcedelete')"><i class="fa-solid fa-radiation"></i>Forcedelete</button>` : ""}`;
     document.getElementById("detailOverlay").classList.add("active");
 }
 
 async function adminNuke(title, authorEmail) {
 
-```
+
 if (!user || user.email !== ADMIN_EMAIL) {
     alert("Admin only.");
     return;
@@ -348,45 +348,37 @@ try {
 } catch (err) {
     console.error("Admin nuke error:", err);
 }
-```
+
 
 }
 
-async function sendVote(title, type) {
+async function sendVote(title, email, type) {
 
     try {
-
-        // toggle logic
-        if (type === "like") {
-            localStorage.removeItem(`disliked_${title}`);
-            localStorage.setItem(`voted_${title}`, true);
-        }
-
-        if (type === "dislike") {
-            localStorage.removeItem(`voted_${title}`);
-            localStorage.setItem(`disliked_${title}`, true);
-        }
-
-        if (type === "report") {
-            localStorage.setItem(`reported_${title}`, true);
-        }
 
         const res = await fetch(API + "/interact", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ title, type })
+            body: JSON.stringify({
+                title: title,
+                email: email,
+                type: type
+            })
         });
 
         const data = await res.json();
 
         if (data.success) {
+            console.log("Vote success:", type);
             searchForms();
-            closeDetail();
+        } else {
+            console.error("Vote rejected:", data);
         }
 
     } catch (err) {
         console.error("Vote error:", err);
     }
+
 }
 
 
@@ -397,6 +389,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
