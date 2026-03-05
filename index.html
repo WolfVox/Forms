@@ -324,40 +324,26 @@ function openDetail(index) {
     document.getElementById("detailOverlay").classList.add("active");
 }
 
-async function sendVote(title, email, type) {
-
-    if (type === 'like' && hasVoted(title, email, 'disliked')) {
-        localStorage.removeItem(`disliked_${title}_${email}`);
-    }
-
-    if (type === 'dislike' && hasVoted(title, email, 'voted')) {
-        localStorage.removeItem(`voted_${title}_${email}`);
-    }
+async function sendVote(id, type) {
 
     const res = await fetch(API + "/interact", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, email, type })
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            id: id,
+            type: type
+        })
     });
 
     const data = await res.json();
 
     if (data.success) {
-
-        const key =
-            type === "like"
-                ? "voted"
-                : type === "dislike"
-                ? "disliked"
-                : "reported";
-
-        localStorage.setItem(`${key}_${title}_${email}`, true);
-
         searchForms();
         closeDetail();
     }
 }
-
 function closeDetail() { document.getElementById("detailOverlay").classList.remove("active"); }
 
 updateNav();
