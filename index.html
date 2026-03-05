@@ -325,24 +325,18 @@ function openDetail(index) {
 }
 
 async function sendVote(id, type) {
+  await fetch(API + "/interact", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      id: id,
+      type: type
+    })
+  });
 
-    const res = await fetch(API + "/interact", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            id: id,
-            type: type
-        })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-        searchForms();
-        closeDetail();
-    }
+  loadForms();
 }
 function closeDetail() { document.getElementById("detailOverlay").classList.remove("active"); }
 
