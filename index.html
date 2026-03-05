@@ -281,7 +281,12 @@ function openDetail(index) {
     const disliked = hasVoted(item.title, 'disliked');
     const reported = hasVoted(item.title, 'reported');
     
-    // YouTube
+    // Author Profile Header
+    const authorImg = item.authorImg || `https://ui-avatars.com/api/?name=${item.authorName || '?'}`;
+    const authorName = item.authorName || "Anonymous";
+    const authorEmail = item.authorEmail || "Public Contributor";
+
+    // Video Logic
     let videoHTML = "";
     if (item.video) {
         let vidId = "";
@@ -292,30 +297,30 @@ function openDetail(index) {
         }
     }
 
-    // File Download
-    let fileHTML = item.file ? `
-        <div style="margin-top:20px; padding:12px; background:#000; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:space-between;">
-            <div style="font-size:13px;"><i class="fa-solid fa-file-arrow-down" style="color:var(--accent)"></i> ${item.file.split('/').pop()}</div>
-            <a href="${item.file}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600; font-size:12px;">Download Attachment</a>
-        </div>` : "";
+    // File Logic
+    let fileHTML = item.file ? `<div style="margin-top:20px; padding:12px; background:#000; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:space-between;"><div style="font-size:13px;"><i class="fa-solid fa-file-arrow-down" style="color:var(--accent)"></i> ${item.file.split('/').pop()}</div><a href="${item.file}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600; font-size:12px;">Download Attachment</a></div>` : "";
 
-    // Links
+    // Links Logic
     let linksHTML = "";
     if (item.links && item.links.length > 0) {
         linksHTML = `<div style="margin-top:20px; display:flex; flex-wrap:wrap; gap:8px;">`;
         item.links.forEach(link => {
             if(link && link.trim() !== "") {
-                linksHTML += `
-                    <a href="${link.startsWith('http') ? link : 'https://' + link}" target="_blank" style="background:var(--card-bg); border:1px solid var(--border); color:var(--text-main); padding:6px 12px; border-radius:20px; text-decoration:none; font-size:12px; display:flex; align-items:center; gap:6px;">
-                        <i class="fa-solid fa-link" style="font-size:10px; color:var(--accent)"></i> 
-                        ${link.replace('https://','').replace('http://','').split('/')[0]}
-                    </a>`;
+                linksHTML += `<a href="${link.startsWith('http') ? link : 'https://' + link}" target="_blank" style="background:var(--card-bg); border:1px solid var(--border); color:var(--text-main); padding:6px 12px; border-radius:20px; text-decoration:none; font-size:12px; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-link" style="font-size:10px; color:var(--accent)"></i> ${link.replace('https://','').replace('http://','').split('/')[0]}</a>`;
             }
         });
         linksHTML += `</div>`;
     }
 
     document.getElementById("detailContent").innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid var(--border);">
+            <img src="${authorImg}" width="40" height="40" style="border-radius:50%; border:1px solid var(--accent); object-fit:cover;">
+            <div>
+                <div style="font-size:14px; font-weight:700; color:white;">${authorName}</div>
+                <div style="font-size:11px; color:var(--text-dim);">${authorEmail}</div>
+            </div>
+        </div>
+        
         <h2 style="font-family: Arial, sans-serif; margin-bottom:5px;">${item.title}</h2>
         <div style="font-size:12px; color:var(--text-dim); margin-bottom:20px;">Shared via WolfVox Platform</div>
 
