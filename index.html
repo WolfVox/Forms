@@ -324,9 +324,11 @@ function openDetail(index) {
     document.getElementById("detailOverlay").classList.add("active");
 }
 
-function sendVote(title,email,type){
+async function sendVote(title,email,type){
 
-fetch("https://backhand-forms.onrender.com/api/forms/interact",{
+try{
+
+const res = await fetch(API + "/interact",{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -337,11 +339,21 @@ email:email,
 type:type
 })
 })
-.then(r=>r.json())
-.then(data=>{
+
+const data = await res.json()
+
 console.log(data)
-})
+
+searchForms()   // refresh likes
+closeDetail()
+
+}catch(err){
+console.error("Vote error:",err)
 }
+
+}
+
+
 function closeDetail() { document.getElementById("detailOverlay").classList.remove("active"); }
 
 updateNav();
