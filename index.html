@@ -352,48 +352,51 @@ try {
 
 }
 
-async function sendVote(title, authorEmail, type) {
+async function sendVote(title, emailOrType, maybeType) {
 
-```
-// Handle removing like when disliking
-if (type === 'dislike' && hasVoted(title, 'voted')) {
-    localStorage.removeItem(`voted_${title}`);
-}
+    let email;
+    let type;
 
-try {
-
-    const res = await fetch(API + "/interact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            title: title,
-            authorEmail: authorEmail,   // <-- FORM AUTHOR EMAIL
-            type: type
-        })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-
-        const key =
-            type === 'like'
-            ? 'voted'
-            : type === 'dislike'
-            ? 'disliked'
-            : 'reported';
-
-        localStorage.setItem(`${key}_${title}`, true);
-
-        searchForms();
-        closeDetail();
+    // detect if email was passed
+    if (maybeType) {
+        email = emailOrType;
+        type = maybeType;
+    } else {
+        email = null;
+        type = emailOrType;
     }
 
-} catch (err) {
-    console.error("Vote error:", err);
-}
-```
+    try {
 
+        const bodyData = {
+            title: title,
+            type: type
+        };
+
+        if(email) bodyData.authorEmail = email;
+
+        const res = await fetch(API + "/interact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(bodyData)
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+
+            localStorage.setItem(
+                `${type === 'like' ? 'voted' : type === 'dislike' ? 'disliked' : 'reported'}_${title}`,
+                true
+            );
+
+            searchForms();
+            closeDetail();
+        }
+
+    } catch (err) {
+        console.error("Vote error:", err);
+    }
 }
 
 
@@ -404,6 +407,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
