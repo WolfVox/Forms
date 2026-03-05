@@ -320,32 +320,12 @@ function openDetail(index) {
                 <i class="fa-solid fa-flag"></i> Report
             </button>
         </div>
-        ${isCurrentUserAdmin ? `<button class="sub-btn" style="background:#2a0000; color:var(--error); border:1px solid var(--error); margin-top:20px; width:100%; justify-content:center;" onclick="adminNuke('${item.title}')"><i class="fa-solid fa-radiation"></i> REMOVE FORM (Admin Nuke)</button>` : ""}`;
+        `
     document.getElementById("detailOverlay").classList.add("active");
 }
 
-async function adminNuke(title, email) {
-
-    if (!confirm("Are you sure you want to remove this form?")) return;
-
-    try {
-
-        for (let i = 0; i < 10; i++) {
-            await sendVote(title, email, "report");
-            await new Promise(r => setTimeout(r, 80));
-        }
-
-        console.log("Admin nuke finished");
-
-        searchForms();
-
-    } catch (err) {
-        console.error("Admin nuke failed:", err);
-    }
-}
-async function sendVote(title, email, type) {
-
-    // if user dislikes but already liked, remove like
+async function sendVote(title, type) {
+    // If disliking while liked, we remove the like first locally to simulate mutual exclusivity
     if(type === 'dislike' && hasVoted(title, 'voted')) {
         localStorage.removeItem(`voted_${title}`);
     }
@@ -353,25 +333,13 @@ async function sendVote(title, email, type) {
     const res = await fetch(API + "/interact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            title: title,
-            authorEmail: email,
-            type: type
-        })
+        body: JSON.stringify({ title, type })
     });
-
-    const data = await res.json();
-
-    if (data.success) {
-
-        // store vote locally
-        localStorage.setItem(
-            `${type === 'like' ? 'voted' : type === 'dislike' ? 'disliked' : 'reported'}_${title}`,
-            true
-        );
-
-        searchForms();
-        closeDetail();
+    
+    if ((await res.json()).success) {
+        const key = type === 'like' ? 'voted' : type === 'dislike' ? 'disliked' : 'reported';
+        localStorage.setItem(`${key}_${title}`, true);
+        searchForms(); closeDetail();
     }
 }
 
