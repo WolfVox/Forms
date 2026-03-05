@@ -158,28 +158,90 @@ async function searchForms() {
 
 function openDetail(index) {
     const item = currentData[index];
-    const isOwner = user && user.email === item.authorEmail;
-
-    document.getElementById("detailContent").innerHTML = `
+    const liked = hasVoted(item.title, 'voted');
+    const disliked = hasVoted(item.title, 'disliked');
+    const reported = hasVoted(item.title, 'reported');
+    
+    // --- 1. AUTHOR VERIFICATION HEADER ---
+    const authorHeader = `
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid var(--border);">
-            <img src="${item.authorImg || 'https://ui-avatars.com/api/?name=User'}" width="40" style="border-radius:50%; border:2px solid var(--accent)">
+            <img src="${item.authorImg || 'https://ui-avatars.com/api/?name=User'}" 
+                 width="42" height="42" style="border-radius:50%; border:2px solid var(--accent); background:#000;">
             <div>
-                <div style="font-size:14px; font-weight:600; color:white;">${item.authorName || 'Anonymous'} <i class="fa-solid fa-circle-check" style="color:var(--accent); font-size:10px;"></i></div>
-                <div style="font-size:11px; color:var(--text-dim);">${item.authorEmail || 'Unverified'}</div>
+                <div style="font-size:14px; font-weight:600; color:white; display:flex; align-items:center; gap:5px;">
+                    ${item.authorName || 'Anonymous User'} 
+                    <i class="fa-solid fa-circle-check" style="color:var(--accent); font-size:11px;" title="Verified Creator"></i>
+                </div>
+                <div style="font-size:11px; color:var(--text-dim);">${item.authorEmail || 'unverified@wolfvox.io'}</div>
             </div>
         </div>
-
-        <h2 style="margin:0 0 10px 0;">${item.title}</h2>
-        <div style="background:var(--card-bg); border:1px solid var(--border); padding:20px; border-radius:8px; color:#ccc; line-height:1.6;">
-            ${item.content}
-            ${item.image ? `<img src="${item.image}" class="img-preview">` : ""}
-        </div>
-
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="sub-btn" style="background:var(--border); flex:1;" onclick="sendVote('${item.title}', 'like')"><i class="fa-solid fa-thumbs-up"></i> Like (${item.likes || 0})</button>
-            ${isOwner ? `<button class="sub-btn" style="color:var(--error);" onclick="deleteForm('${item.title}')"><i class="fa-solid fa-trash"></i> Delete</button>` : ''}
-        </div>
     `;
+
+    // --- 2. YOUTUBE PLAYER LOGIC ---
+    let videoHTML = "";
+    if (item.video) {
+        let vidId = "";
+        if (item.video.includes("v=")) vidId = item.video.split("v=")[1].split("&")[0];
+        else if (item.video.includes("youtu.be/")) vidId = item.video.split("youtu.be/")[1];
+        
+        if (vidId) {
+            videoHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${vidId}" 
+                         frameborder="0" allowfullscreen style="border-radius:8px; margin-top:15px; border:1px solid var(--border);"></iframe>`;
+        }
+    }
+
+    // --- 3. FILE DOWNLOAD BOX ---
+    let fileHTML = item.file ? `
+        <div style="margin-top:20px; padding:12px; background:#000; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:space-between;">
+            <div style="font-size:13px;"><i class="fa-solid fa-file-arrow-down" style="color:var(--accent)"></i> ${item.file.split('/').pop()}</div>
+            <a href="${item.file}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600; font-size:12px; border:1px solid var(--accent); padding:4px 8px; border-radius:4px;">Download</a>
+        </div>` : "";
+
+    // --- 4. EXTERNAL LINKS LOGIC ---
+    let linksHTML = "";
+    if (item.links && item.links.length > 0) {
+        linksHTML = `<div style="margin-top:20px; display:flex; flex-wrap:wrap; gap:8px;">`;
+        item.links.forEach(link => {
+            if(link && link.trim() !== "") {
+                linksHTML += `
+                    <a href="${link.startsWith('http') ? link : 'https://' + link}" target="_blank" 
+                       style="background:var(--header); border:1px solid var(--border); color:var(--text-main); 
+                       padding:6px 12px; border-radius:20px; text-decoration:none; font-size:12px; display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-link" style="font-size:10px; color:var(--accent)"></i> 
+                        ${link.replace('https://','').replace('http://','').split('/')[0]}
+                    </a>`;
+            }
+        });
+        linksHTML += `</div>`;
+    }
+
+    // --- 5. FULL RENDER ---
+    document.getElementById("detailContent").innerHTML = `
+        ${authorHeader}
+        
+        <h2 style="font-family: Arial, sans-serif; margin-bottom:5px; color:white;">${item.title}</h2>
+        <div style="font-size:11px; color:var(--text-dim); margin-bottom:20px;">Published on ${item.date || 'Recent'}</div>
+
+        <div style="background:var(--card-bg); border:1px solid var(--border); padding:20px; border-radius:8px;">
+            <div style="font-family: Arial, sans-serif; line-height:1.6; color:#eee;">${item.content}</div>
+            ${item.image ? `<img src="${item.image}" class="img-preview" style="max-width:100%; border-radius:8px; margin-top:15px; border:1px solid var(--border);">` : ""}
+            ${videoHTML}
+            ${fileHTML}
+            ${linksHTML} 
+        </div>
+        
+        <div style="margin-top:25px; display:flex; gap:10px;">
+            <button class="sub-btn ${liked ? 'vote-disabled' : ''}" style="background:var(--border); flex:1; justify-content:center;" onclick="sendVote('${item.title}', 'like')">
+                <i class="fa-solid fa-thumbs-up"></i> ${liked ? 'Liked' : 'Like'} (${item.likes || 0})
+            </button>
+            <button class="sub-btn ${disliked ? 'vote-disabled' : ''}" style="background:var(--border); flex:1; justify-content:center;" onclick="sendVote('${item.title}', 'dislike')">
+                <i class="fa-solid fa-thumbs-down"></i> Dislike
+            </button>
+            <button class="sub-btn ${reported ? 'vote-disabled' : ''}" style="background:var(--border); flex:1; justify-content:center;" onclick="sendVote('${item.title}', 'report')">
+                <i class="fa-solid fa-flag"></i> Report
+            </button>
+        </div>`;
+
     document.getElementById("detailOverlay").classList.add("active");
 }
 
@@ -196,3 +258,4 @@ searchForms();
 </script>
 </body>
 </html>
+
