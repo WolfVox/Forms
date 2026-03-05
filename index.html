@@ -6,6 +6,8 @@
     <title>WolfVox™ | DevForms</title>
     <link rel="icon" type="image/x-icon" href="https://github.com/WolfVox/wolfvox.github.io/blob/main/WolfVoxLogo.png?raw=true">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <style>
         :root {
             --bg: #060608;
@@ -68,10 +70,7 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 3000; }
         .modal-content { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; }
         .modal-content input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid var(--border); color: white; border-radius: 6px; }
-        .btn-google { width: 100%; padding: 12px; background: white; color: black; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
-        .account-box { border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-top: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; text-align: left; }
-        .account-box:hover { background: var(--border); }
-
+        
         .overlay {
             position: fixed; top: 0; right: -100%; width: 100%; max-width: 600px;
             height: 100%; background: var(--header); border-left: 1px solid var(--border);
@@ -109,7 +108,7 @@
 <body>
 
 <nav>
-    <h2 style="font-size: 18px;">Wolf<span style="color:var(--accent)">Vox</span></h2>
+    <h2 style="font-size: 18px; margin:0;">Wolf<span style="color:var(--accent)">Vox</span></h2>
     <div class="search-container">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" id="searchInput" placeholder="Search or jump to..." onkeyup="if(event.key==='Enter') searchForms()">
@@ -122,22 +121,38 @@
 </nav>
 
 <div id="authModal" class="modal">
-    <div class="modal-content" id="modalStage">
+    <div class="modal-content">
         <h3>Sign In</h3>
-        <button class="btn-google" onclick="showGoogleAccounts()">
-            <img src="https://www.google.com/favicon.ico" width="16"> Continue with Google
-        </button>
-        <div style="margin:15px 0; font-size:12px; color:var(--text-dim);">OR EMAIL</div>
+        
+        <div id="g_id_onload"
+             data-client_id="116311894928-qararv9qqqhtjomb2nbljfbrgrho9uft.apps.googleusercontent.com"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleGoogleLogin"
+             data-auto_prompt="false">
+        </div>
+
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="pill"
+             data-theme="filled_black"
+             data-text="continue_with"
+             data-size="large"
+             data-logo_alignment="left"
+             style="display: flex; justify-content: center;">
+        </div>
+
+        <div style="margin:20px 0; font-size:12px; color:var(--text-dim);">OR EMAIL</div>
         <input type="email" id="emailInput" placeholder="Gmail Address">
         <input type="password" id="passInput" placeholder="Password">
-        <p id="errorMsg" style="color:var(--error); font-size:11px; display:none; margin:0;">Something is wrong. Please check credentials.</p>
+        <p id="errorMsg" style="color:var(--error); font-size:11px; display:none; margin:0;">Invalid credentials.</p>
         <button onclick="validateLogin()" style="width:100%; padding:10px; background:var(--accent); border:none; color:white; border-radius:6px; cursor:pointer; margin-top:10px;">Login</button>
         <button onclick="closeAuth()" style="background:none; border:none; color:var(--text-dim); margin-top:10px; cursor:pointer;">Cancel</button>
     </div>
 </div>
 
 <div class="sub-nav">
-    <button class="sub-btn active" onclick="location.href='index'">
+    <button class="sub-btn active" onclick="location.href='index.html'">
         <i class="fa-solid fa-code"></i> Forms
     </button>
     <button class="sub-btn" onclick="location.href='Market'">
@@ -181,6 +196,11 @@ function hasVoted(title, type) { return localStorage.getItem(`${type}_${title}`)
 function openAuth() { document.getElementById('authModal').style.display='flex'; }
 function closeAuth() { document.getElementById('authModal').style.display='none'; }
 
+function handleGoogleLogin(response) {
+    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    loginUser(payload.name, payload.email, payload.picture);
+}
+
 function validateLogin() {
     const e = document.getElementById('emailInput').value;
     const p = document.getElementById('passInput').value;
@@ -189,33 +209,23 @@ function validateLogin() {
     } else { document.getElementById('errorMsg').style.display = 'block'; }
 }
 
-function showGoogleAccounts() {
-    document.getElementById('modalStage').innerHTML = `
-        <h3>Choose an account</h3>
-        <div class="account-box" onclick="loginUser('Dev User', 'dev@gmail.com', 'https://ui-avatars.com/api/?name=Dev')">
-            <img src="https://ui-avatars.com/api/?name=Dev" width="30" style="border-radius:50%">
-            <div><div style="font-size:13px">Dev User</div><div style="font-size:11px; color:var(--text-dim)">dev@gmail.com</div></div>
-        </div>
-        <button onclick="location.reload()" style="background:none; border:none; color:var(--accent); margin-top:15px; cursor:pointer;">Back</button>`;
-}
-
 function loginUser(name, email, img) {
     localStorage.setItem('wv_user', JSON.stringify({name, email, img}));
     location.reload();
 }
 
 function handlePublish() {
-    if(!user) { openAuth(); } else { window.location.href = 'Create'; }
+    if(!user) { openAuth(); } else { window.location.href = 'Create.html'; }
 }
 
 function updateNav() {
     if(user) {
         document.getElementById('navAuthArea').innerHTML = `
-            <div style="display:flex; align-items:center; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px; background:var(--card-bg); padding:5px 10px; border-radius:20px; border:1px solid var(--border);">
                 <span style="font-size:12px;">${user.name}</span>
-                <img src="${user.img}" width="24" style="border-radius:50%; border:1px solid var(--accent)">
+                <img src="${user.img}" width="24" height="24" style="border-radius:50%; border:1px solid var(--accent); object-fit:cover;">
             </div>
-            <button onclick="handlePublish()" class="FeedBackBtn" style="height:auto; padding:8px 15px;">Publish</button>
+            <button onclick="handlePublish()" class="FeedBackBtn" style="height:35px; padding:0 15px;">Publish</button>
             <a href="#" onclick="localStorage.removeItem('wv_user'); location.reload();" style="color:var(--error); text-decoration:none; font-size:11px;">Logout</a>`;
     }
 }
@@ -263,8 +273,6 @@ async function searchForms() {
 function openDetailFromData(item) {
     currentData = [item];
     openDetail(0);
-    const q = document.getElementById("searchInput").value;
-    if(!q) searchForms(); 
 }
 
 function openDetail(index) {
@@ -273,6 +281,7 @@ function openDetail(index) {
     const disliked = hasVoted(item.title, 'disliked');
     const reported = hasVoted(item.title, 'reported');
     
+    // YouTube
     let videoHTML = "";
     if (item.video) {
         let vidId = "";
@@ -283,19 +292,21 @@ function openDetail(index) {
         }
     }
 
+    // File Download
     let fileHTML = item.file ? `
         <div style="margin-top:20px; padding:12px; background:#000; border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:space-between;">
             <div style="font-size:13px;"><i class="fa-solid fa-file-arrow-down" style="color:var(--accent)"></i> ${item.file.split('/').pop()}</div>
             <a href="${item.file}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600; font-size:12px;">Download Attachment</a>
         </div>` : "";
 
+    // Links
     let linksHTML = "";
     if (item.links && item.links.length > 0) {
         linksHTML = `<div style="margin-top:20px; display:flex; flex-wrap:wrap; gap:8px;">`;
         item.links.forEach(link => {
-            if(link.trim() !== "") {
+            if(link && link.trim() !== "") {
                 linksHTML += `
-                    <a href="${link.startsWith('http') ? link : 'https://' + link}" target="_blank" style="background:var(--header); border:1px solid var(--border); color:var(--text-main); padding:6px 12px; border-radius:20px; text-decoration:none; font-size:12px; display:flex; align-items:center; gap:6px;">
+                    <a href="${link.startsWith('http') ? link : 'https://' + link}" target="_blank" style="background:var(--card-bg); border:1px solid var(--border); color:var(--text-main); padding:6px 12px; border-radius:20px; text-decoration:none; font-size:12px; display:flex; align-items:center; gap:6px;">
                         <i class="fa-solid fa-link" style="font-size:10px; color:var(--accent)"></i> 
                         ${link.replace('https://','').replace('http://','').split('/')[0]}
                     </a>`;
@@ -345,6 +356,7 @@ async function sendVote(title, type) {
 }
 
 function closeDetail() { document.getElementById("detailOverlay").classList.remove("active"); }
+
 updateNav();
 searchForms();
 </script>
