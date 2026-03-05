@@ -203,40 +203,15 @@ function updateNav() {
 async function searchForms() {
     const q = document.getElementById("searchInput").value.toLowerCase().trim();
     const results = document.getElementById("results");
-
     results.innerHTML = "<div style='padding:40px; text-align:center;'>Searching WolfVox Database...</div>";
 
     try {
         const res = await fetch(API);
         let data = await res.json();
-
-        // Filter results
-        const filteredData = data.filter(item => {
-            const titleMatch = item.title && item.title.toLowerCase().includes(q);
-            const contentMatch = item.content && item.content.toLowerCase().includes(q);
-            return titleMatch || contentMatch;
-        });
+        const filteredData = data.filter(item => (item.title?.toLowerCase().includes(q) || item.content?.toLowerCase().includes(q)));
 
         results.innerHTML = "";
-
-        // No results UI
-        if (filteredData.length === 0) {
-            results.innerHTML = `
-                <div style="padding:60px; text-align:center; color:var(--text-dim);">
-                    <i class="fa-solid fa-magnifying-glass" style="font-size:30px; margin-bottom:15px; opacity:0.3;"></i>
-                    <p>No forms found matching "<b>${q}</b>"</p>
-                    <button onclick="document.getElementById('searchInput').value=''; searchForms();" 
-                        style="background:none; border:1px solid var(--border); color:var(--accent);
-                        padding:8px 15px; border-radius:6px; cursor:pointer;">
-                        Clear Search
-                    </button>
-                </div>`;
-            return;
-        }
-
-        // Render results
         filteredData.reverse().forEach((item) => {
-
             const authorImg = item.authorImg || `https://ui-avatars.com/api/?name=${item.authorName || '?'}`;
             const isVerified = item.authorEmail === ADMIN_EMAIL;
 
@@ -244,36 +219,18 @@ async function searchForms() {
             <div class="form-row" onclick="openDetailFromData(${JSON.stringify(item).replace(/"/g, '&quot;')})">
                 <div>
                     <span style="color:var(--accent); font-weight:600;">${item.title}</span>
-
-                    <div style="display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-dim); margin-top:4px;">
-                        <img src="${authorImg}" width="16" height="16"
-                        style="border-radius:50%; border:1px solid var(--border);">
-
-                        <span>
-                            by ${item.authorName || 'Anonymous'}
-                            ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''}
-                        </span>
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-dim); margin-top: 4px;">
+                        <img src="${authorImg}" width="16" height="16" style="border-radius:50%; border:1px solid var(--border);">
+                        <span>by ${item.authorName || 'Anonymous'} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''}</span>
                     </div>
-
-                    <div style="font-size:11px; color:var(--text-dim); margin-top:2px;">
-                        Published ${item.date || 'Recently'}
-                    </div>
-
                 </div>
-
                 <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
                     <span><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</span>
                 </div>
             </div>`;
         });
-
-        // Store data for detail panel
         currentData = filteredData;
-
-    } catch (e) {
-        results.innerHTML =
-        "<div style='color:coral; text-align:center; padding:40px;'>Search Offline. Check API connection.</div>";
-    }
+    } catch (e) { results.innerHTML = "<div style='color:coral; text-align:center; padding:40px;'>Search Offline.</div>"; }
 }
 
 function openDetailFromData(item) { currentData = [item]; openDetail(0); }
@@ -382,4 +339,10 @@ searchForms();
 </script>
 </body>
 </html>
+
+
+
+
+
+
 
