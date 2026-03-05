@@ -78,6 +78,14 @@
         .overlay.active { right: 0; box-shadow: -20px 0 50px rgba(0,0,0,0.8); }
         .close-btn { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 24px; color: var(--text-dim); }
 
+        .sitemap-container {
+            max-width: 1100px; margin: 80px auto 20px;
+            background: var(--card-bg); border: 1px solid var(--border);
+            border-radius: 12px; padding: 40px; display: flex;
+            justify-content: space-evenly; align-items: center;
+        }
+        .sitemap-col a { display: block; color: var(--accent); text-decoration: none; margin-bottom: 8px; font-size: 14px; }
+        
         footer { text-align: center; padding: 40px; color: var(--text-dim); font-size: 13px; background-color: #0f0f0f ; border-top: 1px solid var(--border); }
         .img-preview { width: 100%; border-radius: 8px; margin: 20px 0; border: 1px solid var(--border); display: block; }
         .vote-disabled { opacity: 0.3; cursor: not-allowed !important; pointer-events: none; }
@@ -123,10 +131,9 @@
         </div>
         <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="filled_black" data-text="continue_with" data-size="large" data-logo_alignment="left" style="display: flex; justify-content: center;"></div>
         
-        <div style="margin:25px 0 10px; font-size:12px; color:var(--text-dim);">DIRECT LOGIN (DECORATION)</div>
-        <input type="email" id="emailInput" placeholder="Email Address" disabled>
-        <input type="password" id="passInput" placeholder="Password" disabled>
-        <button style="width:100%; padding:10px; background:var(--border); border:none; color:var(--text-dim); border-radius:6px; cursor:not-allowed; margin-top:5px;">Sign In Disabled</button>
+        <div style="margin:20px 0; font-size:12px; color:var(--text-dim);">OR EMAIL (DECORATION)</div>
+        <input type="email" placeholder="Email Address" disabled>
+        <input type="password" placeholder="Password" disabled>
         <button onclick="closeAuth()" style="background:none; border:none; color:var(--text-dim); margin-top:10px; cursor:pointer;">Cancel</button>
     </div>
 </div>
@@ -154,7 +161,7 @@ const API = "https://backhand-forms.onrender.com/api/forms";
 let currentData = [];
 let user = JSON.parse(localStorage.getItem('wv_user')) || null;
 
-// ADMIN & VERIFY CONFIG
+// ADMIN CONFIG
 const ADMIN_EMAIL = "wolfvoxco@gmail.com";
 
 function hasVoted(title, type) { return localStorage.getItem(`${type}_${title}`); }
@@ -200,7 +207,6 @@ async function searchForms() {
         results.innerHTML = "";
         filteredData.reverse().forEach((item) => {
             const authorImg = item.authorImg || `https://ui-avatars.com/api/?name=${item.authorName || '?'}`;
-            const authorName = item.authorName || "Anonymous";
             const isVerified = item.authorEmail === ADMIN_EMAIL;
 
             results.innerHTML += `
@@ -209,7 +215,7 @@ async function searchForms() {
                     <span style="color:var(--accent); font-weight:600;">${item.title}</span>
                     <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-dim); margin-top: 4px;">
                         <img src="${authorImg}" width="16" height="16" style="border-radius:50%; border:1px solid var(--border);">
-                        <span>by ${authorName} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''} • ${item.date || 'Recently'}</span>
+                        <span>by ${item.authorName || 'Anonymous'} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''}</span>
                     </div>
                 </div>
                 <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
@@ -226,55 +232,65 @@ function openDetailFromData(item) { currentData = [item]; openDetail(0); }
 function openDetail(index) {
     const item = currentData[index];
     const liked = hasVoted(item.title, 'voted');
+    const disliked = hasVoted(item.title, 'disliked');
     const reported = hasVoted(item.title, 'reported');
     
-    const authorImg = item.authorImg || `https://ui-avatars.com/api/?name=${item.authorName || '?'}`;
-    const authorEmail = item.authorEmail || "Public Contributor";
-    const isVerified = authorEmail === ADMIN_EMAIL;
+    const isVerified = item.authorEmail === ADMIN_EMAIL;
     const isCurrentUserAdmin = user && user.email === ADMIN_EMAIL;
 
-    let mediaHTML = "";
+    let videoHTML = "";
     if (item.video) {
         let vidId = item.video.includes("v=") ? item.video.split("v=")[1].split("&")[0] : item.video.split("youtu.be/")[1];
-        if (vidId) mediaHTML += `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen style="border-radius:8px; margin-top:15px; border:1px solid var(--border);"></iframe>`;
+        if (vidId) videoHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen style="border-radius:8px; margin-top:15px; border:1px solid var(--border);"></iframe>`;
     }
 
     document.getElementById("detailContent").innerHTML = `
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid var(--border);">
-            <img src="${authorImg}" width="40" height="40" style="border-radius:50%; border:1px solid var(--accent); object-fit:cover;">
+            <img src="${item.authorImg || 'https://ui-avatars.com/api/?name=?'}" width="40" height="40" style="border-radius:50%; border:1px solid var(--accent); object-fit:cover;">
             <div>
                 <div style="font-size:14px; font-weight:700; color:white; display:flex; align-items:center;">
                     ${item.authorName || 'Anonymous'} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); margin-left:5px;"></i>' : ''}
                 </div>
-                <div style="font-size:11px; color:var(--text-dim);">${authorEmail}</div>
+                <div style="font-size:11px; color:var(--text-dim);">${item.authorEmail || 'Public Contributor'}</div>
             </div>
         </div>
         <h2 style="margin-bottom:5px;">${item.title}</h2>
         <div style="background:var(--card-bg); border:1px solid var(--border); padding:20px; border-radius:8px;">
             <div style="line-height:1.6;">${item.content}</div>
             ${item.image ? `<img src="${item.image}" class="img-preview">` : ""}
-            ${mediaHTML}
+            ${videoHTML}
         </div>
         <div style="margin-top:25px; display:flex; gap:10px;">
-            <button class="sub-btn ${liked ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'like')"><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</button>
-            <button class="sub-btn ${reported ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'report')"><i class="fa-solid fa-flag"></i> Report</button>
+            <button class="sub-btn ${liked ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'like')">
+                <i class="fa-solid fa-thumbs-up"></i> ${liked ? 'Liked' : 'Like'} (${item.likes || 0})
+            </button>
+            <button class="sub-btn ${disliked ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'dislike')">
+                <i class="fa-solid fa-thumbs-down"></i> Dislike
+            </button>
+            <button class="sub-btn ${reported ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'report')">
+                <i class="fa-solid fa-flag"></i> Report
+            </button>
         </div>
-        ${isCurrentUserAdmin ? `<button class="sub-btn" style="background:#2a0000; color:var(--error); border:1px solid var(--error); margin-top:20px; width:100%; justify-content:center;" onclick="adminNuke('${item.title}')"><i class="fa-solid fa-radiation"></i> NUKE FORM (1.75k Reports)</button>` : ""}`;
+        ${isCurrentUserAdmin ? `<button class="sub-btn" style="background:#2a0000; color:var(--error); border:1px solid var(--error); margin-top:20px; width:100%; justify-content:center;" onclick="adminNuke('${item.title}')"><i class="fa-solid fa-radiation"></i> REMOVE FORM (Admin Nuke)</button>` : ""}`;
     document.getElementById("detailOverlay").classList.add("active");
 }
 
 async function adminNuke(title) {
-    if (!confirm("Are you sure? This will mass-report the form to hide it.")) return;
+    if (!confirm("Are you sure you want to remove this form?")) return;
     for (let i = 0; i < 1750; i++) {
         fetch(API + "/interact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, type: 'report' }) });
-        if (i % 100 === 0) await new Promise(r => setTimeout(r, 30));
+        if (i % 100 === 0) await new Promise(r => setTimeout(r, 20));
     }
-    alert("Nuke Successful."); location.reload();
+    alert("Form removal command sent."); location.reload();
 }
 
 async function sendVote(title, type) {
+    if(type === 'dislike' && hasVoted(title, 'voted')) { localStorage.removeItem(`voted_${title}`); }
     const res = await fetch(API + "/interact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, type }) });
-    if ((await res.json()).success) { localStorage.setItem(`${type==='like'?'voted':'reported'}_${title}`, true); searchForms(); closeDetail(); }
+    if ((await res.json()).success) { 
+        localStorage.setItem(`${type==='like'?'voted':type==='dislike'?'disliked':'reported'}_${title}`, true); 
+        searchForms(); closeDetail(); 
+    }
 }
 
 function closeDetail() { document.getElementById("detailOverlay").classList.remove("active"); }
