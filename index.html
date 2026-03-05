@@ -324,19 +324,23 @@ function openDetail(index) {
     document.getElementById("detailOverlay").classList.add("active");
 }
 
-async function sendVote(id, type) {
-  await fetch(API + "/interact", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      id: id,
-      type: type
-    })
-  });
+function sendVote(title,email,type){
 
-  loadForms();
+fetch("https://backhand-forms.onrender.com/api/forms/interact",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+title:title,
+email:email,
+type:type
+})
+})
+.then(r=>r.json())
+.then(data=>{
+console.log(data)
+})
 }
 function closeDetail() { document.getElementById("detailOverlay").classList.remove("active"); }
 
