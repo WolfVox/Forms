@@ -280,15 +280,14 @@ function openDetailFromData(item) { currentData = [item]; openDetail(0); }
 
 function openDetail(index) {
     const item = currentData[index];
-    const email = item.authorEmail || ''; // Get email or empty string for old data
+    const email = item.authorEmail || ''; 
     
-    // Check local storage using the Title + Email combination
-    const liked = localStorage.getItem(`voted_${item.title}_${email}`) === 'like';
-    const disliked = localStorage.getItem(`voted_${item.title}_${email}`) === 'dislike';
-    const reported = localStorage.getItem(`voted_${item.title}_${email}`) === 'report';
+    // Check if the LOGGED-IN user's email is in the server's arrays
+    const liked = user && item.likedBy && item.likedBy.includes(user.email);
+    const disliked = user && item.dislikedBy && item.dislikedBy.includes(user.email);
+    const reported = user && item.reportedBy && item.reportedBy.includes(user.email);
     
     const isVerified = item.authorEmail === ADMIN_EMAIL;
-    const isCurrentUserAdmin = user && user.email === ADMIN_EMAIL;
 
     let mediaHTML = "";
     if (item.video) {
@@ -334,25 +333,45 @@ function openDetail(index) {
 }
 
 async function sendVote(title, authorEmail, type) {
-    const res = await fetch(API + "/interact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            title: title,
-            authorEmail: authorEmail, // Now correctly passed to backend
-            type: type
-        })
-    });
+    // 1. Requirement: Must be logged in
+    if (!user || !user.email) {
+        alert("You must be signed in to vote.");
+        openAuth();
+        return;
+    }
 
-    const data = await res.json();
+    try {
+        const res = await fetch(API + "/interact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                title: title,
+                authorEmail: authorEmail,
+                voterEmail: user.email, // Sends your account email to the server
+                type: type
+            })
+        });
 
-    if (res.ok) {
-        // Use title + email for the local storage key to keep it unique
-        localStorage.setItem(`voted_${title}_${authorEmail}`, type);
-        searchForms();
-        closeDetail();
-    } else {
-        alert(data.error);
+        const data = await res.json();
+
+        if (res.ok) {
+            // Success! Refresh the main list to get updated vote counts
+            await searchForms(); 
+            
+            // Find the updated item in our local data to refresh the overlay text
+            const updatedItem = currentData.find(f => f.title === title && f.authorEmail === authorEmail);
+            if (updatedItem) {
+                // We refresh the detail view so the button turns gray (disabled) immediately
+                openDetail(currentData.indexOf(updatedItem));
+            } else {
+                closeDetail();
+            }
+        } else {
+            alert(data.error || "Action failed.");
+        }
+    } catch (err) {
+        console.error("Network Error:", err);
+        alert("Server is currently unreachable.");
     }
 }
 
@@ -363,6 +382,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
