@@ -210,39 +210,47 @@ async function searchForms() {
         const res = await fetch(API);
         let data = await res.json();
 
+        // 1. Filter results based on search input
         const filteredData = data.filter(item => {
             const titleMatch = item.title && item.title.toLowerCase().includes(q);
             const contentMatch = item.content && item.content.toLowerCase().includes(q);
             return titleMatch || contentMatch;
         });
 
+        // 2. SORT BY LIKES (The fix for "Most likes on top")
+        filteredData.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+
         results.innerHTML = "";
 
+        // 3. No results UI logic (Restored from your original)
         if (filteredData.length === 0) {
-            results.innerHTML = `<div style="padding:60px; text-align:center; color:var(--text-dim);">No forms found matching "<b>${q}</b>"</div>`;
+            results.innerHTML = `
+                <div style="padding:60px; text-align:center; color:var(--text-dim);">
+                    <i class="fa-solid fa-magnifying-glass" style="font-size:30px; margin-bottom:15px; opacity:0.3;"></i>
+                    <p>No forms found matching "<b>${q}</b>"</p>
+                    <button onclick="document.getElementById('searchInput').value=''; searchForms();" 
+                        style="background:none; border:1px solid var(--border); color:var(--accent);
+                        padding:8px 15px; border-radius:6px; cursor:pointer;">
+                        Clear Search
+                    </button>
+                </div>`;
             return;
         }
 
-        filteredData.reverse().forEach((item) => {
+        // 4. Render results
+        filteredData.forEach((item) => {
+            // Restore Author Image logic
             const authorImg = item.authorImg || `https://ui-avatars.com/api/?name=${item.authorName || '?'}`;
             const isVerified = item.authorEmail === ADMIN_EMAIL;
             
-// Inside filteredData.reverse().forEach((item) => { ...
+            // Clean ID Logic (Username + Title)
+            const emailUser = item.authorEmail ? item.authorEmail.split('@')[0].toLowerCase() : 'anonymous';
+            const cleanTitle = item.title.toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '') 
+                .replace(/\s+/g, '-');      
 
-// 1. Get the email prefix (e.g., masvoxco)
-const emailUser = item.authorEmail ? item.authorEmail.split('@')[0].toLowerCase() : 'anonymous';
-
-// 2. Clean the Title: lowercase, remove special characters, replace spaces with hyphens
-const cleanTitle = item.title.toLowerCase()
-    .replace(/[^a-z0-9\s]/g, '') // remove symbols
-    .replace(/\s+/g, '-');      // replace spaces with hyphens
-
-// 3. Create the final ID
-const formID = `${emailUser}-${cleanTitle}`;
-
-// 4. Construct the URL
-const viewerURL = `https://wolfvox.github.io/Form/index.html?id=${formID}`;
-            
+            const formID = `${emailUser}-${cleanTitle}`;
+            const viewerURL = `https://wolfvox.github.io/Form/index.html?id=${formID}`;
 
             results.innerHTML += `
             <div class="form-row" style="flex-direction: column; align-items: flex-start; gap: 10px;">
@@ -251,16 +259,22 @@ const viewerURL = `https://wolfvox.github.io/Form/index.html?id=${formID}`;
                         <span style="color:var(--accent); font-weight:600; font-size: 16px;">${item.title}</span>
                         <div style="display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-dim); margin-top:4px;">
                             <img src="${authorImg}" width="16" height="16" style="border-radius:50%; border:1px solid var(--border);">
-                            <span>by ${item.authorName || 'Anonymous'} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''}</span>
+                            <span>
+                                by ${item.authorName || 'Anonymous'} 
+                                ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''}
+                            </span>
                         </div>
                     </div>
-                    <div style="color:var(--text-dim); font-size:13px;">
-                        <i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}
+                    <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
+                        <span><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</span>
                     </div>
                 </div>
-                
+
                 <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 5px;">
-                    <span style="font-size: 11px; color: var(--text-dim);">UserID: ${emailUser}</span>
+                    <div style="font-size:11px; color:var(--text-dim);">
+                        UserID: ${emailUser} • Published ${item.date || 'Recently'}
+                    </div>
+                    
                     <button onclick="window.location.href='${viewerURL}'" 
                         style="background: var(--accent); color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
                         Read More <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
@@ -269,6 +283,7 @@ const viewerURL = `https://wolfvox.github.io/Form/index.html?id=${formID}`;
             </div>`;
         });
 
+        // Store for global access
         currentData = filteredData;
 
     } catch (e) {
@@ -382,6 +397,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
