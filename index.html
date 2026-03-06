@@ -324,35 +324,26 @@ function openDetail(index) {
     document.getElementById("detailOverlay").classList.add("active");
 }
 
-async function sendVote(title, email, type) {
-
-    // if user dislikes but already liked, remove like
-    if(type === 'dislike' && hasVoted(title, 'voted')) {
-        localStorage.removeItem(`voted_${title}`);
-    }
-
+async function sendVote(title, authorEmail, type) {
     const res = await fetch(API + "/interact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             title: title,
-            authorEmail: email,
+            authorEmail: authorEmail, // Now correctly passed to backend
             type: type
         })
     });
 
     const data = await res.json();
 
-    if (data.success) {
-
-        // store vote locally
-        localStorage.setItem(
-            `${type === 'like' ? 'voted' : type === 'dislike' ? 'disliked' : 'reported'}_${title}`,
-            true
-        );
-
+    if (res.ok) {
+        // Use title + email for the local storage key to keep it unique
+        localStorage.setItem(`voted_${title}_${authorEmail}`, type);
         searchForms();
         closeDetail();
+    } else {
+        alert(data.error);
     }
 }
 
@@ -363,6 +354,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
