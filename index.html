@@ -210,7 +210,7 @@ async function searchForms() {
         const res = await fetch(API);
         let data = await res.json();
 
-        // Filter results
+        // Filter results based on search input
         const filteredData = data.filter(item => {
             const titleMatch = item.title && item.title.toLowerCase().includes(q);
             const contentMatch = item.content && item.content.toLowerCase().includes(q);
@@ -219,7 +219,7 @@ async function searchForms() {
 
         results.innerHTML = "";
 
-        // No results UI
+        // No results UI logic
         if (filteredData.length === 0) {
             results.innerHTML = `
                 <div style="padding:60px; text-align:center; color:var(--text-dim);">
@@ -234,45 +234,52 @@ async function searchForms() {
             return;
         }
 
-        // Render results
+        // Render results with "Read More" integration
         filteredData.reverse().forEach((item) => {
-
             const authorImg = item.authorImg || `https://ui-avatars.com/api/?name=${item.authorName || '?'}`;
             const isVerified = item.authorEmail === ADMIN_EMAIL;
+            
+            // Generate the unique ID for the URL (username+title)
+            const formID = (item.authorName + "+" + item.title).replace(/\s+/g, '');
+            // Link to your SECOND repository ("Form")
+            const viewerURL = `https://wolfvox.github.io/Form/?id=${formID}`;
 
             results.innerHTML += `
-            <div class="form-row" onclick="openDetailFromData(${JSON.stringify(item).replace(/"/g, '&quot;')})">
-                <div>
-                    <span style="color:var(--accent); font-weight:600;">${item.title}</span>
-
-                    <div style="display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-dim); margin-top:4px;">
-                        <img src="${authorImg}" width="16" height="16"
-                        style="border-radius:50%; border:1px solid var(--border);">
-
-                        <span>
-                            by ${item.authorName || 'Anonymous'}
-                            ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''}
-                        </span>
+            <div class="form-row" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span style="color:var(--accent); font-weight:600; font-size: 16px;">${item.title}</span>
+                        <div style="display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-dim); margin-top:4px;">
+                            <img src="${authorImg}" width="16" height="16" style="border-radius:50%; border:1px solid var(--border);">
+                            <span>
+                                by ${item.authorName || 'Anonymous'} 
+                                ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''}
+                            </span>
+                        </div>
                     </div>
-
-                    <div style="font-size:11px; color:var(--text-dim); margin-top:2px;">
-                        Published ${item.date || 'Recently'}
+                    <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
+                        <span><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</span>
                     </div>
-
                 </div>
 
-                <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
-                    <span><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</span>
+                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 5px;">
+                    <div style="font-size:11px; color:var(--text-dim);">
+                        Published ${item.date || 'Recently'}
+                    </div>
+                    
+                    <button onclick="window.location.href='${viewerURL}'" 
+                        style="background: var(--accent); color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                        Read More <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
+                    </button>
                 </div>
             </div>`;
         });
 
-        // Store data for detail panel
+        // Store data for the side overlay (if users still click the row background)
         currentData = filteredData;
 
     } catch (e) {
-        results.innerHTML =
-        "<div style='color:coral; text-align:center; padding:40px;'>Search Offline. Check API connection.</div>";
+        results.innerHTML = "<div style='color:coral; text-align:center; padding:40px;'>Search Offline. Check API connection.</div>";
     }
 }
 
@@ -382,6 +389,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
