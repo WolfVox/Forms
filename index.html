@@ -210,7 +210,6 @@ async function searchForms() {
         const res = await fetch(API);
         let data = await res.json();
 
-        // Filter results based on search input
         const filteredData = data.filter(item => {
             const titleMatch = item.title && item.title.toLowerCase().includes(q);
             const contentMatch = item.content && item.content.toLowerCase().includes(q);
@@ -219,30 +218,26 @@ async function searchForms() {
 
         results.innerHTML = "";
 
-        // No results UI logic
         if (filteredData.length === 0) {
-            results.innerHTML = `
-                <div style="padding:60px; text-align:center; color:var(--text-dim);">
-                    <i class="fa-solid fa-magnifying-glass" style="font-size:30px; margin-bottom:15px; opacity:0.3;"></i>
-                    <p>No forms found matching "<b>${q}</b>"</p>
-                    <button onclick="document.getElementById('searchInput').value=''; searchForms();" 
-                        style="background:none; border:1px solid var(--border); color:var(--accent);
-                        padding:8px 15px; border-radius:6px; cursor:pointer;">
-                        Clear Search
-                    </button>
-                </div>`;
+            results.innerHTML = `<div style="padding:60px; text-align:center; color:var(--text-dim);">No forms found matching "<b>${q}</b>"</div>`;
             return;
         }
 
-        // Render results with "Read More" integration
         filteredData.reverse().forEach((item) => {
             const authorImg = item.authorImg || `https://ui-avatars.com/api/?name=${item.authorName || '?'}`;
             const isVerified = item.authorEmail === ADMIN_EMAIL;
             
-            // Generate the unique ID for the URL (username+title)
-            const formID = (item.authorName + "+" + item.title).replace(/\s+/g, '');
-            // Link to your SECOND repository ("Form")
-            const viewerURL = `https://wolfvox.github.io/Form/?id=${formID}`;
+            // 1. Get username from email (sss from sss@gmail.com)
+            const emailUser = item.authorEmail ? item.authorEmail.split('@')[0] : 'anonymous';
+            
+            // 2. Clean Title (Remove spaces and non-alphanumeric chars)
+            const cleanTitle = item.title.replace(/[^a-zA-Z0-9]/g, '');
+            
+            // 3. Construct ID
+            const formID = `${emailUser}+${cleanTitle}`;
+            
+            // 4. Construct URL (Adding index.html helps prevent GitHub 404s)
+            const viewerURL = `https://wolfvox.github.io/Form/index.html?id=${formID}`;
 
             results.innerHTML += `
             <div class="form-row" style="flex-direction: column; align-items: flex-start; gap: 10px;">
@@ -251,22 +246,16 @@ async function searchForms() {
                         <span style="color:var(--accent); font-weight:600; font-size: 16px;">${item.title}</span>
                         <div style="display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-dim); margin-top:4px;">
                             <img src="${authorImg}" width="16" height="16" style="border-radius:50%; border:1px solid var(--border);">
-                            <span>
-                                by ${item.authorName || 'Anonymous'} 
-                                ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''}
-                            </span>
+                            <span>by ${item.authorName || 'Anonymous'} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''}</span>
                         </div>
                     </div>
-                    <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
-                        <span><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</span>
+                    <div style="color:var(--text-dim); font-size:13px;">
+                        <i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}
                     </div>
                 </div>
-
+                
                 <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 5px;">
-                    <div style="font-size:11px; color:var(--text-dim);">
-                        Published ${item.date || 'Recently'}
-                    </div>
-                    
+                    <span style="font-size: 11px; color: var(--text-dim);">UserID: ${emailUser}</span>
                     <button onclick="window.location.href='${viewerURL}'" 
                         style="background: var(--accent); color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
                         Read More <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
@@ -275,7 +264,6 @@ async function searchForms() {
             </div>`;
         });
 
-        // Store data for the side overlay (if users still click the row background)
         currentData = filteredData;
 
     } catch (e) {
@@ -389,6 +377,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
