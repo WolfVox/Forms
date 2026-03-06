@@ -280,9 +280,12 @@ function openDetailFromData(item) { currentData = [item]; openDetail(0); }
 
 function openDetail(index) {
     const item = currentData[index];
-    const liked = hasVoted(item.title, 'voted');
-    const disliked = hasVoted(item.title, 'disliked');
-    const reported = hasVoted(item.title, 'reported');
+    const email = item.authorEmail || ''; // Get email or empty string for old data
+    
+    // Check local storage using the Title + Email combination
+    const liked = localStorage.getItem(`voted_${item.title}_${email}`) === 'like';
+    const disliked = localStorage.getItem(`voted_${item.title}_${email}`) === 'dislike';
+    const reported = localStorage.getItem(`voted_${item.title}_${email}`) === 'report';
     
     const isVerified = item.authorEmail === ADMIN_EMAIL;
     const isCurrentUserAdmin = user && user.email === ADMIN_EMAIL;
@@ -310,17 +313,23 @@ function openDetail(index) {
             ${mediaHTML}
         </div>
         <div style="margin-top:25px; display:flex; gap:10px;">
-            <button class="sub-btn ${liked ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'like')">
+            <button class="sub-btn ${liked ? 'vote-disabled' : ''}" 
+                    style="background:var(--border);" 
+                    onclick="sendVote('${item.title}', '${email}', 'like')">
                 <i class="fa-solid fa-thumbs-up"></i> ${liked ? 'Liked' : 'Like'} (${item.likes || 0})
             </button>
-            <button class="sub-btn ${disliked ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'dislike')">
-                <i class="fa-solid fa-thumbs-down"></i> Dislike
+            <button class="sub-btn ${disliked ? 'vote-disabled' : ''}" 
+                    style="background:var(--border);" 
+                    onclick="sendVote('${item.title}', '${email}', 'dislike')">
+                <i class="fa-solid fa-thumbs-down"></i> ${disliked ? 'Disliked' : 'Dislike'}
             </button>
-            <button class="sub-btn ${reported ? 'vote-disabled' : ''}" style="background:var(--border);" onclick="sendVote('${item.title}', 'report')">
-                <i class="fa-solid fa-flag"></i> Report
+            <button class="sub-btn ${reported ? 'vote-disabled' : ''}" 
+                    style="background:var(--border);" 
+                    onclick="sendVote('${item.title}', '${email}', 'report')">
+                <i class="fa-solid fa-flag"></i> ${reported ? 'Reported' : 'Report'}
             </button>
         </div>
-        `
+        `;
     document.getElementById("detailOverlay").classList.add("active");
 }
 
@@ -354,6 +363,7 @@ searchForms();
 </script>
 </body>
 </html>
+
 
 
 
