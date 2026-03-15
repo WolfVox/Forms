@@ -2,22 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/x-icon" href="https://github.com/WolfVox/wolfvox.github.io/blob/main/WolfVoxLogo.png?raw=true">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WolfVox™ | Create Form</title>
+    <link rel="icon" type="image/x-icon" href="https://github.com/WolfVox/wolfvox.github.io/blob/main/WolfVoxLogo.png?raw=true">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <style>
         :root {
-            --bg: #060608;
-            --header: #111113;
-            --card-bg: #161618;
+            --bg: #000000;
+            --header: #000000;
+            --card-bg: #0f0f10;
+            --Notic-bg: rgb(0, 0, 0);
             --border: #2d2d30;
             --accent: #7a6cff;
             --text-main: #eeeeee;
             --text-dim: #a1a1aa;
+            --render-green: #00d1b2;
+            --error: #ff4d4d;
         }
 
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: all 0.1s ease; }
+        
         body { 
             background-color: var(--bg); 
             background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
@@ -25,11 +31,34 @@
             color: var(--text-main); margin: 0; padding-bottom: 100px;
         }
 
-        nav { padding: 12px 30px; background: var(--header); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top:0; z-index: 1000;}
+        /* NAVIGATION (Hub Standard) */
+        nav {
+            display: flex; align-items: center; gap: 20px;
+            padding: 12px 30px; background: var(--header); border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .search-container { flex: 1; max-width: 400px; position: relative; }
+        .search-container input {
+            width: 100%; background: #000; border: 1px solid var(--border);
+            color: white; padding: 6px 12px 6px 35px; border-radius: 6px; font-size: 13px;
+        }
+        .search-container i { position: absolute; left: 12px; top: 9px; color: var(--text-dim); font-size: 12px; }
 
-        .publish-container { max-width: 800px; margin: 40px auto; padding: 40px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; }
+        .sub-nav {
+            display: flex; gap: 5px; padding: 10px 30px; 
+            background: var(--header); border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+        .sub-btn {
+            background: transparent; border: none; color: var(--text-main);
+            padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .sub-btn:hover { background: var(--border); }
 
-        /* USER DISPLAY BOX */
+        /* EDITOR LAYOUT */
+        .publish-container { max-width: 850px; margin: 0 auto; padding: 40px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; }
+
         .user-identity {
             display: flex; align-items: center; gap: 12px;
             background: rgba(122, 108, 255, 0.05);
@@ -38,79 +67,93 @@
         }
 
         .input-group { margin-bottom: 25px; }
-        label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
+        label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        input, textarea {
+        input {
             width: 100%; background: #000; border: 1px solid var(--border);
             color: white; padding: 12px; border-radius: 6px; font-size: 14px; margin-bottom: 10px;
         }
         input:focus { border-color: var(--accent); outline: none; }
 
         .toolbar {
-            display: flex; gap: 8px; background: var(--header); 
+            display: flex; gap: 8px; background: #000; 
             padding: 10px; border: 1px solid var(--border); 
             border-bottom: none; border-radius: 6px 6px 0 0;
         }
         .tool-btn {
             background: transparent; border: 1px solid transparent; 
-            color: white; cursor: pointer; padding: 8px 12px; border-radius: 6px;
+            color: white; cursor: pointer; padding: 8px 12px; border-radius: 6px; font-size: 13px;
         }
-        .tool-btn.active-tool { 
-            background: rgba(122, 108, 255, 0.15); 
-            border: 1px solid var(--accent) !important; 
-            color: var(--accent);
-            box-shadow: 0 0 10px rgba(122, 108, 255, 0.2);
-        }
+        .tool-btn:hover { background: var(--border); }
+        .tool-btn.active-tool { background: rgba(122, 108, 255, 0.15); border-color: var(--accent); color: var(--accent); }
         
         #editor {
-            min-height: 200px; padding: 15px; background: #000;
+            min-height: 250px; padding: 20px; background: #000;
             border: 1px solid var(--border); border-radius: 0 0 6px 6px;
             outline: none; line-height: 1.6; color: #fff; overflow-y: auto;
         }
 
         .plus-btn {
             background: transparent; border: 1px dashed var(--border);
-            color: var(--accent); padding: 8px; border-radius: 6px;
-            cursor: pointer; width: 100%; margin-bottom: 15px; font-size: 12px; font-weight: bold;
+            color: var(--accent); padding: 10px; border-radius: 6px;
+            cursor: pointer; width: 100%; margin-bottom: 20px; font-size: 12px; font-weight: bold;
         }
+        .plus-btn:hover { background: rgba(122, 108, 255, 0.05); border-color: var(--accent); }
 
-        #chromaPalette { display: none; gap: 8px; padding: 12px; background: var(--header); border: 1px solid var(--border); border-top: none; }
+        #chromaPalette { display: none; gap: 8px; padding: 12px; background: #000; border: 1px solid var(--border); border-top: none; }
         .color-box { width: 22px; height: 22px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
 
-        .submit-btn {
-            width: 100%; background: var(--accent); color: white;
-            border: none; padding: 18px; border-radius: 6px;
-            font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 20px;
+        .FeedBackBtn {
+            position:relative; overflow:hidden; border-radius:0px; border:1px solid rgb(255, 255, 255);
+            background:rgba(0, 0, 0, 0.02); color:white; font-weight:600; letter-spacing:0.4px;
+            backdrop-filter:blur(6px); transition:all .25s cubic-bezier(.4,0,.2,1);
+            box-shadow:0 4px 18px rgba(0,0,0,0.25); padding:15px; flex:1; width: 100%; margin-top: 30px; cursor: pointer;
         }
+        .FeedBackBtn:hover { color:#000; background:#fff; }
+
+        footer { text-align: center; padding: 50px; color: var(--text-dim); font-size: 13px; background-color: #000; border-top: 1px solid var(--border); margin-top: 100px;}
     </style>
 </head>
 <body>
 
 <nav>
-    <h2 onclick="location.href='index.html'" style="cursor:pointer">Wolf<span style="color:var(--accent)">Vox</span></h2>
-    <div id="navUser" style="display:flex; align-items:center; gap:10px;">
-        <span id="navUserName" style="font-size: 12px; color: var(--text-dim);">Not Signed In</span>
+    <img src="https://github.com/WolfVox/wolfvox.github.io/blob/main/WolfVoxLogo.png?raw=true" height="30px" width="30px" onclick="location.href='index.html'" style="cursor:pointer">
+    <h2 style="font-size: 18px; margin:0;">Wolf<span style="color:var(--accent)">Vox</span></h2>
+    <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search forms..." onkeyup="if(event.key==='Enter') window.location.href='index.html?q='+this.value">
     </div>
+    <div style="flex-grow: 1;"></div>
+    <div class="nav-links" id="navAuthArea" style="font-size: 14px; display: flex; gap: 15px; align-items: center;">
+        </div>
 </nav>
+
+<div class="sub-nav">
+    <button class="sub-btn" onclick="location.href='index.html'"><i class="fa-solid fa-code"></i> Forms</button>
+    <button class="sub-btn" onclick="location.href='Market'"><i class="fa-solid fa-shop"></i> Marketplace</button>
+    <button class="sub-btn" onclick="location.href='Docs'"><i class="fa-solid fa-book"></i> Docs</button>
+    <button class="sub-btn" onclick="location.href='Insights'"><i class="fa-solid fa-chart-line"></i> Insights</button>
+</div>
 
 <section class="publish-container">
     <div class="user-identity" id="authorDisplay">
         <img id="userImg" src="https://ui-avatars.com/api/?name=?" width="45" style="border-radius:50%; border:2px solid var(--accent)">
         <div>
-            <div id="userName" style="font-weight: 700; color: white; font-size: 16px;">Loading account...</div>
-            <div id="userEmail" style="font-size: 12px; color: var(--text-dim);">gmail.com</div>
+            <div id="userName" style="font-weight: 700; color: white; font-size: 16px;">Authenticating...</div>
+            <div id="userEmail" style="font-size: 12px; color: var(--text-dim);">Connecting to WolfVox ID</div>
         </div>
     </div>
 
-    <h1 style="margin-bottom:30px;">Publish Form</h1>
+    <h1 style="margin: 0 0 10px 0; font-size: 28px;">New Publication</h1>
+    <p style="color:var(--text-dim); font-size: 14px; margin-bottom: 40px;">Share your creation with the WolfVox community.</p>
 
     <div class="input-group">
-        <label>Form Title</label>
-        <input id="title" placeholder="What is this form about?">
+        <label>Title</label>
+        <input id="title" placeholder="Give your form a clear name...">
     </div>
 
     <div class="input-group">
-        <label>Description</label>
+        <label>Rich Text Content</label>
         <div class="toolbar">
             <button id="btn-bold" class="tool-btn" onclick="execCmd('bold')"><i class="fa-solid fa-bold"></i></button>
             <button id="btn-italic" class="tool-btn" onclick="execCmd('italic')"><i class="fa-solid fa-italic"></i></button>
@@ -130,39 +173,45 @@
     </div>
 
     <div class="input-group">
-        <label>Media Assets</label>
-        <div id="imgSection"><input name="image" placeholder="Primary Image URL"></div>
-        <button class="plus-btn" onclick="addField('imgSection')">+ Add Image URL</button>
+        <label>Media & Attachments</label>
+        <div id="imgSection"><input name="image" placeholder="Primary Image URL (HTTPS)"></div>
+        <button class="plus-btn" onclick="addField('imgSection')">+ Add Image Slot</button>
 
         <div id="vidSection"><input name="video" placeholder="YouTube Video URL"></div>
-        <button class="plus-btn" onclick="addField('vidSection')">+ Add Video URL</button>
+        <button class="plus-btn" onclick="addField('vidSection')">+ Add Video Slot</button>
 
-        <label>Files & Links</label>
-        <input id="file" placeholder="Main Download URL (Zip/Exe/Pdf)">
+        <label>Direct File Access</label>
+        <input id="file" placeholder="Main Download URL (Zip, Exe, or PDF)">
 
-        <div id="linkSection"><input name="links" placeholder="External Website Link"></div>
-        <button class="plus-btn" onclick="addField('linkSection')">+ Add Link</button>
+        <div id="linkSection"><input name="links" placeholder="Additional Link (e.g. GitHub)"></div>
+        <button class="plus-btn" onclick="addField('linkSection')">+ Add Link Slot</button>
     </div>
 
-    <button class="submit-btn" onclick="submitForm()">
-        <i class="fa-solid fa-paper-plane"></i> Submit to WolfVox
+    <button class="FeedBackBtn" onclick="submitForm()">
+        <i class="fa-solid fa-paper-plane"></i> PUBLISH TO DATABASE
     </button>
 </section>
+
+
 
 <script>
     const API = "https://backhand-forms.onrender.com/api/forms";
     const user = JSON.parse(localStorage.getItem('wv_user'));
 
-    // Security Check: If no user, send back to home
     if (!user) {
-        alert("Please sign in first.");
+        alert("Authorization Required. Redirecting...");
         window.location.href = "index.html";
     } else {
-        // Display user data
         document.getElementById('userName').innerText = user.name;
         document.getElementById('userEmail').innerText = user.email;
         document.getElementById('userImg').src = user.img;
-        document.getElementById('navUserName').innerText = user.name;
+        
+        document.getElementById('navAuthArea').innerHTML = `
+            <div style="display:flex; align-items:center; gap:10px; background:var(--card-bg); padding:5px 10px; border-radius:20px; border:1px solid var(--border);">
+                <span style="font-size:12px;">${user.name}</span>
+                <img src="${user.img}" width="24" height="24" style="border-radius:50%; border:1px solid var(--accent);">
+            </div>
+            <a href="#" onclick="localStorage.removeItem('wv_user'); location.reload();" style="color:var(--error); text-decoration:none; font-size:11px;">Logout</a>`;
     }
 
     const hasChroma = localStorage.getItem('wv_plugin_chroma') === 'unlocked';
@@ -173,10 +222,8 @@
         document.getElementById('btn-italic').classList.toggle('active-tool', document.queryCommandState('italic'));
         const font = document.queryCommandValue('fontName');
         document.getElementById('btn-arial').classList.toggle('active-tool', font.includes('Arial'));
-        
         const color = document.queryCommandValue('foreColor');
-        const isColored = color && color !== 'rgb(238, 238, 238)' && color !== 'white';
-        document.getElementById('btn-palette').classList.toggle('active-tool', isColored);
+        document.getElementById('btn-palette').classList.toggle('active-tool', (color && color !== 'rgb(238, 238, 238)' && color !== 'white'));
     }
 
     function execCmd(command, value = null) {
@@ -202,7 +249,6 @@
             container.appendChild(input);
         } else {
             alert("🔒 Feature Locked! Visit Marketplace for the Expansion Pack.");
-            window.location.href = "Market.html";
         }
     }
 
@@ -231,7 +277,6 @@
                     file, 
                     links: linksArr,
                     date: new Date().toLocaleDateString(),
-                    // ADDED: Identity Tracking
                     authorName: user.name,
                     authorEmail: user.email,
                     authorImg: user.img
@@ -242,10 +287,10 @@
                 alert("Successfully Published!");
                 window.location.href = "index.html";
             } else {
-                alert("Server error. Please try again.");
+                alert("Server rejected the publication.");
             }
         } catch (e) {
-            alert("Could not connect to WolfVox servers.");
+            alert("Connection to backend lost.");
         }
     }
 </script>
