@@ -260,7 +260,7 @@ async function searchForms() {
                 .replace(/\s+/g, '');      
 
             const formID = `${emailUser}-${cleanTitle}`;
-            const viewerURL = `https://wolfvox.github.io/Form/index.html?id=${formID}`;
+            const viewerURL = `https://wolfvox.github.io/Form/?id=${formID}`;
 
             results.innerHTML += `
             <div class="form-row" style="flex-direction: column; align-items: flex-start; gap: 10px;">
