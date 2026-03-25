@@ -220,27 +220,25 @@ async function searchForms() {
         const res = await fetch(API);
         let data = await res.json();
 
-        // 1. Filter results based on search input
+        // 1. Filter results based on search input (Checking both cases)
         const filteredData = data.filter(item => {
-            const titleMatch = item.title && item.title.toLowerCase().includes(q);
-            const contentMatch = item.content && item.content.toLowerCase().includes(q);
-            return titleMatch || contentMatch;
+            const title = item.title || item.Title || "";
+            const content = item.content || item.Content || "";
+            return title.toLowerCase().includes(q) || content.toLowerCase().includes(q);
         });
 
-        // 2. SORT BY LIKES (The fix for "Most likes on top")
+        // 2. SORT BY LIKES
         filteredData.sort((a, b) => (b.likes || 0) - (a.likes || 0));
 
         results.innerHTML = "";
 
-        // 3. No results UI logic (Restored from your original)
         if (filteredData.length === 0) {
             results.innerHTML = `
                 <div style="padding:60px; text-align:center; color:var(--text-dim);">
                     <i class="fa-solid fa-magnifying-glass" style="font-size:30px; margin-bottom:15px; opacity:0.3;"></i>
                     <p>No forms found matching "<b>${q}</b>"</p>
                     <button onclick="document.getElementById('searchInput').value=''; searchForms();" 
-                        style="background:none; border:1px solid var(--border); color:var(--accent);
-                        padding:8px 15px; border-radius:6px; cursor:pointer;">
+                        style="background:none; border:1px solid var(--border); color:var(--accent); padding:8px 15px; border-radius:6px; cursor:pointer;">
                         Clear Search
                     </button>
                 </div>`;
@@ -249,51 +247,51 @@ async function searchForms() {
 
         // 4. Render results
         filteredData.forEach((item) => {
-            // Restore Author Image logic
-            const authorImg = item.authorImg || `https://ui-avatars.com/api/?name=${item.authorName || '?'}`;
-            const isVerified = item.authorEmail === ADMIN_EMAIL;
+            // CASE-INSENSITIVE DATA PULL
+            const fTitle = item.title || item.Title || "Untitled";
+            const fEmail = item.authoremail || item.authorEmail || "";
+            const fName = item.authorname || item.authorName || "Anonymous Wolf";
+            const fImg = item.authorimg || item.authorImg || `https://ui-avatars.com/api/?name=${fName}`;
+            const fDate = item.date || item.Date || "Recently";
+            const fLikes = item.likes || 0;
+
+            const isVerified = fEmail === ADMIN_EMAIL;
             
-            // Clean ID Logic (Username + Title)
-            const emailUser = item.authorEmail ? item.authorEmail.split('@')[0].toLowerCase() : 'anonymous';
-            const cleanTitle = item.title.toLowerCase()
-                .replace(/[^a-z0-9\s]/g, '') 
-                .replace(/\s+/g, '');      
+            // Generate the URL-friendly ID
+            const emailUser = fEmail ? fEmail.split('@')[0].toLowerCase() : 'anonymous';
+            const cleanTitle = fTitle.toLowerCase().replace(/[^a-z0-9]/g, ''); 
 
             const formID = `${emailUser}-${cleanTitle}`;
             const viewerURL = `https://wolfvox.github.io/Form/?id=${formID}`;
 
             results.innerHTML += `
-            <div class="form-row" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+            <div class="form-row" style="flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom:15px; background:var(--card-bg); padding:15px; border-radius:12px; border:1px solid var(--border);">
                 <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <span style="color:var(--accent); font-weight:600; font-size: 16px;">${item.title}</span>
+                        <span style="color:var(--accent); font-weight:700; font-size: 16px;">${fTitle}</span>
                         <div style="display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-dim); margin-top:4px;">
-                            <img src="${authorImg}" width="16" height="16" style="border-radius:50%; border:1px solid var(--border);">
-                            <span>
-                                by ${item.authorName || 'Anonymous'} 
-                                ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''}
-                            </span>
+                            <img src="${fImg}" width="18" height="18" style="border-radius:50%; border:1px solid var(--border); object-fit:cover;">
+                            <span>by ${fName} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''}</span>
                         </div>
                     </div>
                     <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
-                        <span><i class="fa-solid fa-thumbs-up"></i> ${item.likes || 0}</span>
+                        <span><i class="fa-solid fa-thumbs-up"></i> ${fLikes}</span>
                     </div>
                 </div>
 
                 <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 5px;">
                     <div style="font-size:11px; color:var(--text-dim);">
-                        By: ${emailUser} • Published ${item.date || 'Recently'}
+                        ID: ${emailUser} • ${fDate}
                     </div>
                     
                     <button onclick="window.location.href='${viewerURL}'" 
-                        style="background: var(--accent); color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
-                        Read More <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
+                        style="background: var(--accent); color: white; border: none; padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                        VIEW FORM <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
                     </button>
                 </div>
             </div>`;
         });
 
-        // Store for global access
         currentData = filteredData;
 
     } catch (e) {
@@ -301,6 +299,63 @@ async function searchForms() {
     }
 }
 
+// Fixed Detail View for the Hub Modal
+function openDetail(index) {
+    const item = currentData[index];
+    
+    // CASE-INSENSITIVE EXTRACTION
+    const fTitle = item.title || item.Title || "Untitled";
+    const fContent = item.content || item.Content || "";
+    const fEmail = item.authoremail || item.authorEmail || "";
+    const fName = item.authorname || item.authorName || "Anonymous Wolf";
+    const fImg = item.authorimg || item.authorImg || `https://ui-avatars.com/api/?name=${fName}`;
+    const fVideo = item.video || item.Video || "";
+    const fImage = item.image || item.Image || "";
+    const fLikes = item.likes || 0;
+
+    const liked = user && (item.likedby || item.likedBy || []).includes(user.email);
+    const reported = user && (item.reportedby || item.reportedBy || []).includes(user.email);
+    const isVerified = fEmail === ADMIN_EMAIL;
+
+    let mediaHTML = "";
+    if (fVideo) {
+        const vidId = fVideo.includes("v=") ? fVideo.split("v=")[1].split("&")[0] : fVideo.split("/").pop();
+        mediaHTML = `<div style="margin-top:15px; aspect-ratio:16/9; overflow:hidden; border-radius:8px; border:1px solid var(--border);">
+                        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen></iframe>
+                     </div>`;
+    }
+
+    document.getElementById("detailContent").innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid var(--border);">
+            <img src="${fImg}" width="44" height="44" style="border-radius:50%; border:2px solid var(--accent); object-fit:cover; background:#000;">
+            <div>
+                <div style="font-size:15px; font-weight:700; color:white; display:flex; align-items:center;">
+                    ${fName} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); margin-left:5px;"></i>' : ''}
+                </div>
+                <div style="font-size:11px; color:var(--text-dim); font-family:monospace;">@${fEmail.split('@')[0]}</div>
+            </div>
+        </div>
+        <h2 style="margin-bottom:10px; font-size:22px; color:var(--accent);">${fTitle}</h2>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:20px; border-radius:12px;">
+            <div style="line-height:1.7; white-space:pre-wrap; word-break:break-word;">${fContent}</div>
+            ${fImage ? `<img src="${fImage}" style="width:100%; border-radius:8px; margin-top:15px; border:1px solid var(--border);">` : ""}
+            ${mediaHTML}
+        </div>
+        <div style="margin-top:25px; display:flex; gap:12px;">
+            <button class="sub-btn ${liked ? 'vote-disabled' : ''}" 
+                    style="flex:1; background:var(--card-bg); border:1px solid var(--border); padding:12px;" 
+                    onclick="interact('like')">
+                <i class="fa-solid fa-thumbs-up"></i> ${liked ? 'Liked' : 'Like'} (${fLikes})
+            </button>
+            <button class="sub-btn ${reported ? 'vote-disabled' : ''}" 
+                    style="background:var(--card-bg); border:1px solid var(--border); padding:12px; color:var(--error);" 
+                    onclick="interact('report')">
+                <i class="fa-solid fa-flag"></i>
+            </button>
+        </div>
+    `;
+    document.getElementById("detailOverlay").classList.add("active");
+}
 function openDetailFromData(item) { currentData = [item]; openDetail(0); }
 
 function openDetail(index) {
