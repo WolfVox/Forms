@@ -264,32 +264,33 @@ async function searchForms() {
             const formID = `${emailUser}-${cleanTitle}`;
             const viewerURL = `https://wolfvox.github.io/Form/?id=${formID}`;
 
-            results.innerHTML += `
-            <div class="form-row" style="flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom:15px; background:var(--card-bg); padding:15px; border-radius:12px; border:1px solid var(--border);">
-                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <span style="color:var(--accent); font-weight:700; font-size: 16px;">${fTitle}</span>
-                        <div style="display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-dim); margin-top:4px;">
-                            <img src="${fImg}" width="18" height="18" style="border-radius:50%; border:1px solid var(--border); object-fit:cover;">
-                            <span>by ${fName} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''}</span>
-                        </div>
-                    </div>
-                    <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
-                        <span><i class="fa-solid fa-thumbs-up"></i> ${fLikes}</span>
-                    </div>
-                </div>
+// Change the starting <div> of the result template to this:
+results.innerHTML += `
+<div class="form-row">
+    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <span style="color:var(--accent); font-weight:700; font-size: 16px;">${fTitle}</span>
+            <div style="display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-dim); margin-top:4px;">
+                <img src="${fImg}" width="18" height="18" style="border-radius:50%; border:1px solid var(--border); object-fit:cover;">
+                <span>by ${fName} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); font-size:10px;"></i>' : ''}</span>
+            </div>
+        </div>
+        <div style="display:flex; gap:15px; color:var(--text-dim); font-size:13px;">
+            <span><i class="fa-solid fa-thumbs-up"></i> ${fLikes}</span>
+        </div>
+    </div>
 
-                <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 5px;">
-                    <div style="font-size:11px; color:var(--text-dim);">
-                        ID: ${emailUser} • ${fDate}
-                    </div>
-                    
-                    <button onclick="window.location.href='${viewerURL}'" 
-                        style="background: var(--accent); color: white; border: none; padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
-                        VIEW FORM <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
-                    </button>
-                </div>
-            </div>`;
+    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 8px;">
+        <div style="font-size:10px; color:var(--text-dim); font-family:monospace;">
+            ID: ${emailUser} • ${fDate}
+        </div>
+        
+        <button onclick="window.location.href='${viewerURL}'" 
+            style="background: var(--accent); color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+            OPEN <i class="fa-solid fa-chevron-right" style="font-size: 9px;"></i>
+        </button>
+    </div>
+</div>`;
         });
 
         currentData = filteredData;
@@ -375,43 +376,42 @@ function openDetail(index) {
         if (vidId) mediaHTML += `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen style="border-radius:8px; margin-top:15px; border:1px solid var(--border);"></iframe>`;
     }
 
-document.getElementById("detailContent").innerHTML = `
-    <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid var(--border);">
-        <img src="${item.authorimg || item.authorImg || 'https://ui-avatars.com/api/?name=?'}" width="40" height="40" style="border-radius:50%; border:1px solid var(--accent); object-fit:cover;">
-        <div>
-            <div style="font-size:14px; font-weight:700; color:white; display:flex; align-items:center;">
-                ${item.authorname || item.authorName || 'Anonymous'} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); margin-left:5px;"></i>' : ''}
+    document.getElementById("detailContent").innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid var(--border);">
+            <img src="${item.authorImg || 'https://ui-avatars.com/api/?name=?'}" width="40" height="40" style="border-radius:50%; border:1px solid var(--accent); object-fit:cover;">
+            <div>
+                <div style="font-size:14px; font-weight:700; color:white; display:flex; align-items:center;">
+                    ${item.authorName || 'Anonymous'} ${isVerified ? '<i class="fa-solid fa-circle-check" style="color:var(--render-green); margin-left:5px;"></i>' : ''}
+                </div>
+                <div style="font-size:11px; color:var(--text-dim);">${item.authorEmail || 'Public Contributor'}</div>
             </div>
-            <div style="font-size:11px; color:var(--text-dim);">${item.authoremail || item.authorEmail || 'Public Contributor'}</div>
         </div>
-    </div>
-    <h2 style="margin-bottom:5px; color:white;">${item.title || item.Title}</h2>
-    <div style="background:var(--card-bg); border:1px solid var(--border); padding:20px; border-radius:8px;">
-        <div style="line-height:1.6; color:#eee; white-space: pre-wrap;">${item.content || item.Content}</div>
-        
-        ${(item.image || item.Image) ? `<img src="${item.image || item.Image}" style="width:100%; border-radius:8px; margin-top:15px; border:1px solid var(--border);">` : ""}
-        
-        ${mediaHTML}
-    </div>
-    <div style="margin-top:25px; display:flex; gap:10px;">
-        <button class="sub-btn ${liked ? 'vote-disabled' : ''}" 
-                style="background:var(--border); flex:1;" 
-                onclick="sendVote('${item.title || item.Title}', '${item.authoremail || item.authorEmail}', 'like')">
-            <i class="fa-solid fa-thumbs-up"></i> ${liked ? 'Liked' : 'Like'} (${item.likes || 0})
-        </button>
-        <button class="sub-btn ${disliked ? 'vote-disabled' : ''}" 
-                style="background:var(--border); flex:1;" 
-                onclick="sendVote('${item.title || item.Title}', '${item.authoremail || item.authorEmail}', 'dislike')">
-            <i class="fa-solid fa-thumbs-down"></i> ${disliked ? 'Disliked' : 'Dislike'}
-        </button>
-        <button class="sub-btn ${reported ? 'vote-disabled' : ''}" 
-                style="background:var(--border); color:var(--error);" 
-                onclick="sendVote('${item.title || item.Title}', '${item.authoremail || item.authorEmail}', 'report')">
-            <i class="fa-solid fa-flag"></i> ${reported ? 'Reported' : 'Report'}
-        </button>
-    </div>
-`;
-document.getElementById("detailOverlay").classList.add("active");
+        <h2 style="margin-bottom:5px;">${item.title}</h2>
+        <div style="background:var(--card-bg); border:1px solid var(--border); padding:20px; border-radius:8px;">
+            <div style="line-height:1.6;">${item.content}</div>
+            ${item.image ? `<img src="${item.image}" class="img-preview">` : ""}
+            ${mediaHTML}
+        </div>
+        <div style="margin-top:25px; display:flex; gap:10px;">
+            <button class="sub-btn ${liked ? 'vote-disabled' : ''}" 
+                    style="background:var(--border);" 
+                    onclick="sendVote('${item.title}', '${email}', 'like')">
+                <i class="fa-solid fa-thumbs-up"></i> ${liked ? 'Liked' : 'Like'} (${item.likes || 0})
+            </button>
+            <button class="sub-btn ${disliked ? 'vote-disabled' : ''}" 
+                    style="background:var(--border);" 
+                    onclick="sendVote('${item.title}', '${email}', 'dislike')">
+                <i class="fa-solid fa-thumbs-down"></i> ${disliked ? 'Disliked' : 'Dislike'}
+            </button>
+            <button class="sub-btn ${reported ? 'vote-disabled' : ''}" 
+                    style="background:var(--border);" 
+                    onclick="sendVote('${item.title}', '${email}', 'report')">
+                <i class="fa-solid fa-flag"></i> ${reported ? 'Reported' : 'Report'}
+            </button>
+        </div>
+        `;
+    document.getElementById("detailOverlay").classList.add("active");
+}
 
 async function sendVote(title, authorEmail, type) {
     // 1. Requirement: Must be logged in
@@ -463,7 +463,6 @@ searchForms();
 </script>
 </body>
 </html>
-
 
 
 
