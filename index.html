@@ -230,7 +230,15 @@ async function searchForms() {
         results.innerHTML = "";
 
         if (filteredData.length === 0) {
-            results.innerHTML = `<div style="padding:60px; text-align:center; color:var(--text-dim);"><p>No forms found matching "<b>${q}</b>"</p></div>`;
+            results.innerHTML = `
+                <div style="padding:60px; text-align:center; color:var(--text-dim);">
+                    <i class="fa-solid fa-magnifying-glass" style="font-size:30px; margin-bottom:15px; opacity:0.3;"></i>
+                    <p>No forms found matching "<b>${q}</b>"</p>
+                    <button onclick="document.getElementById('searchInput').value=''; searchForms();" 
+                        style="background:none; border:1px solid var(--border); color:var(--accent); padding:8px 15px; border-radius:6px; cursor:pointer;">
+                        Clear Search
+                    </button>
+                </div>`;
             return;
         }
 
