@@ -178,35 +178,73 @@
 
 <script>
 const API = "https://backhand-forms.onrender.com/api/forms";
-let currentData = [];
-let user = JSON.parse(localStorage.getItem('wv_user')) || null;
 const ADMIN_EMAIL = "wolfvoxco@gmail.com";
+let currentData = [];
+
+/** * COOKIE HELPERS 
+ */
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+    return null;
+}
+
+function setCookie(name, value, days = 7) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = "; expires=" + date.toUTCString();
+    document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/; SameSite=Lax";
+}
+
+// Retrieve user from Cookie instead of LocalStorage
+let user = null;
+const cookieData = getCookie('wv_user');
+if (cookieData) {
+    try {
+        user = JSON.parse(cookieData);
+    } catch (e) {
+        console.error("Cookie parse error", e);
+    }
+}
 
 // --- Auth Utilities ---
 function openAuth() { document.getElementById('authModal').style.display='flex'; }
 function closeAuth() { document.getElementById('authModal').style.display='none'; }
+
 function handleGoogleLogin(response) {
     const payload = JSON.parse(atob(response.credential.split('.')[1]));
     loginUser(payload.name, payload.email, payload.picture);
 }
+
 function loginUser(name, email, img) {
-    localStorage.setItem('wv_user', JSON.stringify({name, email, img}));
+    // Save to Cookie
+    const userData = JSON.stringify({name, email, img});
+    setCookie('wv_user', userData, 7);
     location.reload();
 }
+
+function logout() {
+    // Clear Cookie
+    document.cookie = "wv_user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    location.reload();
+}
+
 function handlePublish() {
     if(!user) { openAuth(); } else { window.location.href = 'Create.html'; }
 }
 
 function updateNav() {
-    if(user) {
-        document.getElementById('navAuthArea').innerHTML = `
+    const authArea = document.getElementById('navAuthArea');
+    if(user && authArea) {
+        authArea.innerHTML = `
             <div style="display:flex; align-items:center; gap:10px; background:var(--card-bg); padding:5px 10px; border-radius:20px; border:1px solid var(--border);">
                 <span style="font-size:12px;">${user.name}</span>
                 <img src="${user.img}" width="24" height="24" style="border-radius:50%; border:1px solid var(--accent); object-fit:cover;">
             </div>
-                        <a href="#" onclick="localStorage.removeItem('wv_user'); location.reload();" style="color:var(--error); text-decoration:none; font-size:11px; margin-left:10px;">Logout</a>
+            <a href="javascript:void(0)" onclick="logout()" style="color:var(--error); text-decoration:none; font-size:11px; margin-left:10px;">Logout</a>
             <button onclick="handlePublish()" class="FeedBackBtn" >Publish</button>
-`;
+        `;
     }
 }
 
@@ -378,9 +416,9 @@ async function sendVote(title, authorEmail, type) {
     } catch (err) { alert("Vote failed."); }
 }
 
+// Initialize
 updateNav();
 searchForms();
 </script>
 </body>
 </html>
-
