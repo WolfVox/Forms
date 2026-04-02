@@ -196,12 +196,42 @@
 
 <script>
     const API = "https://backhand-forms.onrender.com/api/forms";
-    const user = JSON.parse(localStorage.getItem('wv_user'));
 
+    /* --- SHARED COOKIE UTILITIES --- */
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+        return null;
+    }
+
+    // NUCLEAR LOGOUT: Clears cookie across all subdomains
+    function logout() {
+        const name = 'wv_user';
+        document.cookie = name + '=; Max-Age=-99999999; path=/; domain=.wolfvox.me; SameSite=Lax';
+        document.cookie = name + '=; Max-Age=-99999999; path=/;';
+        localStorage.removeItem(name); // Legacy cleanup
+        location.reload();
+    }
+
+    /* AUTH INITIALIZATION */
+    const cookieData = getCookie('wv_user');
+    let user = null;
+
+    if (cookieData) {
+        try {
+            user = JSON.parse(cookieData);
+        } catch (e) {
+            console.error("Auth parse error", e);
+        }
+    }
+
+    // Guard Clause: Redirect if not logged in
     if (!user) {
-        alert("Authorization Required. Redirecting...");
-        window.location.href = "index.html";
+        alert("Authorization Required. Redirecting to Login...");
+        window.location.href = "https://login.wolfvox.me";
     } else {
+        // UI Updates
         document.getElementById('userName').innerText = user.name;
         document.getElementById('userEmail').innerText = user.email;
         document.getElementById('userImg').src = user.img;
@@ -211,12 +241,14 @@
                 <span style="font-size:12px;">${user.name}</span>
                 <img src="${user.img}" width="24" height="24" style="border-radius:50%; border:1px solid var(--accent);">
             </div>
-            <a href="#" onclick="localStorage.removeItem('wv_user'); location.reload();" style="color:var(--error); text-decoration:none; font-size:11px;">Logout</a>`;
+            <a href="#" onclick="logout()" style="color:var(--error); text-decoration:none; font-size:11px; margin-left:10px;">Logout</a>`;
     }
 
+    /* PLUGIN LOGIC */
     const hasChroma = localStorage.getItem('wv_plugin_chroma') === 'unlocked';
     const hasExpansion = localStorage.getItem('wv_plugin_expansion') === 'unlocked';
 
+    /* EDITOR FUNCTIONS */
     function updateToolbar() {
         document.getElementById('btn-bold').classList.toggle('active-tool', document.queryCommandState('bold'));
         document.getElementById('btn-italic').classList.toggle('active-tool', document.queryCommandState('italic'));
@@ -237,6 +269,7 @@
             const p = document.getElementById('chromaPalette');
             p.style.display = (p.style.display === 'flex') ? 'none' : 'flex';
         } else {
+            // Default behavior if plugin not owned
             execCmd('foreColor', '#7a6cff');
         }
     }
@@ -252,60 +285,56 @@
         }
     }
 
-async function submitForm() {
-    const title = document.getElementById('title').value;
-    const content = document.getElementById('editor').innerHTML;
-    
-    // Check if user is logged in before allowing publish
-    if (!user) return openAuth();
-
-    if(!title || content === "" || content === "<br>") {
-        return alert("Please fill title and description.");
-    }
-
-    // Get arrays of inputs
-    const images = Array.from(document.querySelectorAll('#imgSection input')).map(i => i.value.trim()).filter(v => v);
-    const videos = Array.from(document.querySelectorAll('#vidSection input')).map(i => i.value.trim()).filter(v => v);
-    const linksArr = Array.from(document.querySelectorAll('#linkSection input')).map(i => i.value.trim()).filter(v => v);
-
-    try {
-        const response = await fetch(API, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                title, 
-                content, 
-                // We send 'image' (singular) because your backend expects that for the main display
-                image: images[0] || "", 
-                // We send 'video' (singular) for the main embed
-                video: videos[0] || "", 
-                // We change 'links' to 'link' so the backend picks up the primary one
-                link: linksArr[0] || "", 
-                
-                // Keeping these just in case your backend ever supports multiple attachments
-                images,
-                videos,
-                links: linksArr,
-
-                authorName: user.name,
-                authorEmail: user.email,
-                authorImg: user.img,
-                date: new Date().toLocaleDateString()
-            })
-        });
-
-        if(response.ok) {
-            alert("Successfully Published! 🐺");
-            window.location.href = "index.html";
-        } else {
-            const errData = await response.json();
-            alert("Error: " + (errData.error || "Server rejected the publication."));
+    /* PUBLISH LOGIC */
+    async function submitForm() {
+        const title = document.getElementById('title').value;
+        const content = document.getElementById('editor').innerHTML;
+        
+        if (!user) {
+            window.location.href = "https://login.wolfvox.me";
+            return;
         }
-    } catch (e) {
-        console.error(e);
-        alert("Connection to backend lost.");
+
+        if(!title || content === "" || content === "<br>") {
+            return alert("Please fill out the title and description.");
+        }
+
+        const images = Array.from(document.querySelectorAll('#imgSection input')).map(i => i.value.trim()).filter(v => v);
+        const videos = Array.from(document.querySelectorAll('#vidSection input')).map(i => i.value.trim()).filter(v => v);
+        const linksArr = Array.from(document.querySelectorAll('#linkSection input')).map(i => i.value.trim()).filter(v => v);
+
+        try {
+            const response = await fetch(API, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    title, 
+                    content, 
+                    image: images[0] || "", 
+                    video: videos[0] || "", 
+                    link: linksArr[0] || "", 
+                    images,
+                    videos,
+                    links: linksArr,
+                    authorName: user.name,
+                    authorEmail: user.email,
+                    authorImg: user.img,
+                    date: new Date().toLocaleDateString()
+                })
+            });
+
+            if(response.ok) {
+                alert("Successfully Published to WolfVox! 🐺");
+                window.location.href = "index.html";
+            } else {
+                const errData = await response.json();
+                alert("Error: " + (errData.error || "Server rejected the publication."));
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Connection to backend lost.");
+        }
     }
-}
 </script>
 </body>
 </html>
