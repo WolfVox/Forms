@@ -3,90 +3,220 @@
 <head>
     <link rel="icon" type="image/x-icon" href="https://github.com/WolfVox/Logos/blob/main/DevForms.png?raw=true">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WolfVox™ | Marketplace</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        :root { --bg: #060608; --header: #111113; --card-bg: #161618; --border: #2d2d30; --accent: #7a6cff; --text-main: #eeeeee; --text-dim: #a1a1aa; }
-        body { background: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; margin: 0; 
-               background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 60px 60px; }
+        :root { 
+            --bg: #000000; 
+            --header: #000000; 
+            --card-bg: #0f0f10; 
+            --border: #2d2d30; 
+            --accent: #7a6cff; 
+            --text-main: #eeeeee; 
+            --text-dim: #a1a1aa; 
+            --error: #ff4d4d;
+        }
+
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: all 0.2s ease; }
         
-        nav { display: flex; align-items: center; padding: 12px 30px; background: var(--header); border-bottom: 1px solid var(--border); }
-        .grid { max-width: 1000px; margin: 50px auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px; }
+        body { 
+            background: var(--bg); 
+            color: var(--text-main); 
+            margin: 0; 
+            padding-bottom: 100px;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); 
+            background-size: 60px 60px; 
+        }
+
+        /* NAVIGATION (Standard WolfVox Style) */
+        nav {
+            display: flex; align-items: center; gap: 20px;
+            padding: 12px 30px; background: var(--header); border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 1000;
+        }
         
-        .plugin-card { background: var(--card-bg); border: 1px solid var(--border); padding: 25px; border-radius: 12px; transition: 0.3s; }
-        .plugin-card:hover { border-color: var(--accent); }
-        .plugin-card h3 { margin: 0 0 10px 0; display: flex; align-items: center; gap: 10px; color: var(--accent); }
-        .plugin-card p { font-size: 13px; color: var(--text-dim); line-height: 1.5; height: 40px; }
+        .search-container { flex: 1; max-width: 400px; position: relative; }
+        .search-container input {
+            width: 100%; background: #000; border: 1px solid var(--border);
+            color: white; padding: 6px 12px 6px 35px; border-radius: 6px; font-size: 13px;
+        }
+        .search-container i { position: absolute; left: 12px; top: 9px; color: var(--text-dim); font-size: 12px; }
+
+        /* MARKETPLACE GRID */
+        .marketplace-header { text-align: center; padding: 60px 20px 20px; }
+        .marketplace-header h1 { font-size: 32px; margin-bottom: 10px; }
+        .marketplace-header p { color: var(--text-dim); font-size: 14px; }
+
+        .grid { 
+            max-width: 1000px; margin: 0 auto; 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 25px; padding: 20px; 
+        }
         
-        .get-btn { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 15px; }
-        .get-btn.owned { background: #22c55e; cursor: default; }
+        .plugin-card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border); 
+            padding: 30px; 
+            border-radius: 12px; 
+            position: relative;
+            overflow: hidden;
+        }
+        .plugin-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .plugin-card i.main-icon { font-size: 40px; color: var(--accent); margin-bottom: 20px; display: block; }
+        .plugin-card h3 { margin: 0 0 12px 0; font-size: 20px; display: flex; align-items: center; gap: 10px; }
+        .plugin-card p { font-size: 14px; color: var(--text-dim); line-height: 1.6; min-height: 45px; margin-bottom: 20px; }
+        
+        .get-btn { 
+            width: 100%; background: transparent; color: white; border: 1px solid var(--accent); 
+            padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px;
+        }
+        .get-btn:hover { background: var(--accent); }
+        .get-btn.owned { background: #22c55e; border-color: #22c55e; cursor: default; }
 
         /* Verification Modal */
-        .v-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 10000; }
-        .v-content { background: var(--card-bg); padding: 40px; border-radius: 12px; border: 1px solid var(--accent); text-align: center; max-width: 400px; }
-        input { width: 100%; padding: 12px; margin: 20px 0; background: #000; border: 1px solid var(--border); color: white; text-align: center; font-size: 18px; letter-spacing: 2px; }
+        .v-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .v-content { background: var(--card-bg); padding: 40px; border-radius: 12px; border: 1px solid var(--accent); text-align: center; max-width: 400px; width: 90%; }
+        .v-content input { width: 100%; padding: 12px; margin: 20px 0; background: #000; border: 1px solid var(--border); color: white; text-align: center; font-size: 18px; letter-spacing: 2px; border-radius: 6px; }
     </style>
 </head>
 <body>
 
 <nav>
-    <h2 onclick="location.href='/Forms'" style="cursor:pointer">Wolf<span style="color:var(--accent)">Vox</span> Dashboard</h2>
+    <img src="https://github.com/WolfVox/Logos/blob/main/wolfvoxtm.png?raw=true" alt="Logo" height="40px" onclick="location.href='/'" style="cursor:pointer">
+    <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search marketplace..." id="marketSearch">
+    </div>
+    <div style="flex-grow: 1;"></div>
+    <div id="navAuthArea" style="font-size: 14px; display: flex; gap: 15px; align-items: center;">
+        </div>
 </nav>
+
+<header class="marketplace-header">
+    <h1>Plugin Marketplace</h1>
+    <p>Enhance your WolfVox experience with premium developer tools.</p>
+</header>
 
 <div class="grid">
     <div class="plugin-card">
-        <h3><i class="fa-solid fa-droplet"></i> Chroma+</h3>
-        <p>Unlock the full color spectrum for text. Standard version only has 1 color.</p>
-        <button id="btn-chroma" class="get-btn" onclick="openVerify('chroma')">Get It</button>
+        <i class="fa-solid fa-droplet main-icon"></i>
+        <h3>Chroma+</h3>
+        <p>Unlock the full color spectrum for your forms. Standard version is limited to default text colors.</p>
+        <button id="btn-chroma" class="get-btn" onclick="openVerify('chroma')">Install Plugin</button>
     </div>
 
     <div class="plugin-card">
-        <h3><i class="fa-solid fa-square-plus"></i> Expansion Pack</h3>
-        <p>Unlock the <b>[+]</b> buttons to add multiple images, videos, and links per form.</p>
-        <button id="btn-expansion" class="get-btn" onclick="openVerify('expansion')">Get It</button>
+        <i class="fa-solid fa-layer-group main-icon"></i>
+        <h3>Expansion Pack</h3>
+        <p>Unlock multi-slot support. Add unlimited images, videos, and GitHub links to a single publication.</p>
+        <button id="btn-expansion" class="get-btn" onclick="openVerify('expansion')">Install Plugin</button>
     </div>
 </div>
 
 <div id="verifyModal" class="v-modal">
     <div class="v-content">
-        <h3 id="modalTitle">Verification</h3>
-        <p style="color: var(--text-dim);">Type the secret word in <b style="color:white">CAPS</b> to install:</p>
-        <h1 id="targetWord" style="letter-spacing: 8px; color: var(--accent); margin: 20px 0;">WOLFVOK</h1>
-        <input type="text" id="userInput" placeholder="EX: HELLO">
-        <button class="get-btn" onclick="checkVerify()">Verify & Install</button>
-        <p onclick="closeVerify()" style="color:var(--text-dim); cursor:pointer; margin-top:15px; font-size:12px;">Go Back</p>
+        <h3 id="modalTitle">Verification Required</h3>
+        <p style="color: var(--text-dim); font-size: 13px;">To verify your developer status, type the word below in <b style="color:white">ALL CAPS</b>:</p>
+        <h1 id="targetWord" style="letter-spacing: 8px; color: var(--accent); margin: 20px 0; font-size: 24px;">WOLFVOK</h1>
+        <input type="text" id="userInput" placeholder="TYPE HERE...">
+        <button class="get-btn" style="background: var(--accent);" onclick="checkVerify()">Verify & Install</button>
+        <p onclick="closeVerify()" style="color:var(--text-dim); cursor:pointer; margin-top:20px; font-size: 12px; text-decoration: underline;">Cancel</p>
     </div>
 </div>
 
 <script>
-    let currentPlugin = "";
-    const words = ["DEVELOPER", "RENDER", "WOLFVOK", "API", "WOLF"];
-
-    function openVerify(id) {
-        currentPlugin = id;
-        document.getElementById('targetWord').innerText = words[Math.floor(Math.random()*words.length)];
-        document.getElementById('verifyModal').style.display = 'flex';
+    /* --- SHARED AUTH LOGIC --- */
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+        return null;
     }
 
-    function closeVerify() { document.getElementById('verifyModal').style.display = 'none'; }
+    function logout() {
+        const name = 'wv_user';
+        document.cookie = name + '=; Max-Age=-99999999; path=/; domain=.wolfvox.me; SameSite=Lax';
+        document.cookie = name + '=; Max-Age=-99999999; path=/;';
+        localStorage.removeItem(name);
+        location.reload();
+    }
+
+    const cookieData = getCookie('wv_user');
+    let user = null;
+    if (cookieData) {
+        try { user = JSON.parse(cookieData); } catch (e) { console.error(e); }
+    }
+
+    // Render User in Nav (Matches your Form/Console pages)
+    const navAuth = document.getElementById('navAuthArea');
+    if (user) {
+        navAuth.innerHTML = `
+            <div style="display:flex; align-items:center; gap:10px; background:var(--card-bg); padding:5px 12px; border-radius:20px; border:1px solid var(--border);">
+                <span style="font-size:12px; color:var(--text-main);">${user.name}</span>
+                <img src="${user.img}" width="24" height="24" style="border-radius:50%; border:1px solid var(--accent);">
+            </div>
+            <a href="#" onclick="logout()" style="color:var(--error); text-decoration:none; font-size:11px; font-weight:bold;">Logout</a>
+        `;
+    } else {
+        navAuth.innerHTML = `<button onclick="location.href='https://login.wolfvox.me'" style="background:var(--accent); border:none; color:white; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:bold;">Sign In</button>`;
+    }
+
+    /* --- MARKETPLACE LOGIC --- */
+    let currentPlugin = "";
+    const words = ["DEVELOPER", "RENDER", "WOLFVOK", "API", "WOLF", "STATION", "CONSOLE"];
+
+    function openVerify(id) {
+        if (!user) {
+            alert("Please Sign In to WolfVox to install plugins!");
+            window.location.href = "https://login.wolfvox.me";
+            return;
+        }
+        currentPlugin = id;
+        document.getElementById('userInput').value = ""; 
+        document.getElementById('targetWord').innerText = words[Math.floor(Math.random()*words.length)];
+        document.getElementById('verifyModal').style.display = 'flex';
+        setTimeout(() => document.getElementById('userInput').focus(), 100);
+    }
+
+    function closeVerify() { 
+        document.getElementById('verifyModal').style.display = 'none'; 
+    }
 
     function checkVerify() {
         const target = document.getElementById('targetWord').innerText;
-        const input = document.getElementById('userInput').value;
+        const input = document.getElementById('userInput').value.trim().toUpperCase();
+        
         if(input === target) {
             localStorage.setItem('wv_plugin_' + currentPlugin, 'unlocked');
-            alert("Success! Plugin installed.");
+            alert("Access Granted! " + currentPlugin.toUpperCase() + " is now active.");
             location.reload();
-        } else { alert("Incorrect. Please try again in ALL CAPS."); }
+        } else { 
+            alert("Verification failed. Please use ALL CAPS."); 
+        }
     }
 
-    // Check ownership
-    if(localStorage.getItem('wv_plugin_chroma')) {
-        const b = document.getElementById('btn-chroma'); b.innerText = "Installed"; b.className = "get-btn owned"; b.onclick = null;
-    }
-    if(localStorage.getItem('wv_plugin_expansion')) {
-        const b = document.getElementById('btn-expansion'); b.innerText = "Installed"; b.className = "get-btn owned"; b.onclick = null;
-    }
+    // Check ownership on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const plugins = ['chroma', 'expansion'];
+        plugins.forEach(p => {
+            if(localStorage.getItem('wv_plugin_' + p) === 'unlocked') {
+                const btn = document.getElementById('btn-' + p);
+                if(btn) {
+                    btn.innerText = "Installed & Active";
+                    btn.className = "get-btn owned";
+                    btn.onclick = null;
+                }
+            }
+        });
+    });
+
+    // Enter Key Support
+    document.getElementById('userInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') checkVerify();
+    });
 </script>
+
 </body>
 </html>
